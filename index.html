@@ -2,1072 +2,1397 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Call Break — कॉल ब्रेक</title>
-<meta name="theme-color" content="#0d2818">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a472a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Call Break">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Call%20Break%22%2C%22short_name%22%3A%22CallBreak%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%231a472a%22%2C%22theme_color%22%3A%22%231a472a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%2527http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%2527%2520viewBox%3D%25270%25200%2532%25202%2527%253E%253Ctext%2520y%3D%252726%2527%2520font-size%3D%252728%2527%253E%25F0%259F%2583%259F%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%7D%5D%7D">
+<title>Call Break - Card Game</title>
 <style>
-/* ═══ RESET ═══ */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --felt:#0d2818;
-  --felt2:#133222;
-  --felt3:#1a4230;
-  --gold:#f5c320;
-  --gold2:#c9980a;
-  --goldfaint:rgba(245,195,32,.18);
-  --red:#e01530;
-  --blue:#2255e8;
-  --shadow:rgba(0,0,0,.65);
-  --wh:rgba(255,255,255,.9);
-  --wh2:rgba(255,255,255,.5);
-  --wh3:rgba(255,255,255,.15);
-}
-html,body{height:100%;height:100dvh;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;background:var(--felt);color:#fff;user-select:none;-webkit-tap-highlight-color:transparent}
+  :root {
+    --green-dark: #0d2b1a;
+    --green-mid: #1a472a;
+    --green-felt: #2d6a4f;
+    --green-light: #52b788;
+    --gold: #f4a261;
+    --gold-dark: #e76f51;
+    --cream: #fdf6e3;
+    --card-bg: #ffffff;
+    --text-dark: #1a1a1a;
+    --shadow: rgba(0,0,0,0.4);
+    --spade: #1a1a2e;
+    --heart: #c1121f;
+    --diamond: #c1121f;
+    --club: #1a1a2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: radial-gradient(ellipse at center, var(--green-felt) 0%, var(--green-dark) 100%);
+    min-height: 100vh;
+    color: var(--cream);
+    overflow: hidden;
+    user-select: none;
+  }
 
-/* ═══ SCREENS ═══ */
-.scr{display:none;width:100%;height:100%}
-.scr.on{display:flex;flex-direction:column}
+  /* ===== SCREENS ===== */
+  .screen { display: none; width: 100%; height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-/* ═══ HOME ═══ */
-#home{align-items:center;justify-content:center;gap:16px;
-  background:radial-gradient(ellipse 90% 70% at 50% 35%,#195c30 0%,#061510 100%);padding:28px 24px}
-.logo-suits{font-size:2.6rem;letter-spacing:12px;filter:drop-shadow(0 3px 8px #000a)}
-.suit-s,.suit-c{color:#f0f0f0}
-.suit-h,.suit-d{color:#f5394a}
-.logo-h{font-size:3rem;font-weight:900;letter-spacing:4px;
-  background:linear-gradient(135deg,#f5c320,#fde68a,#c9980a);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  text-shadow:none;margin:4px 0 0;line-height:1}
-.logo-hi{font-size:.95rem;color:rgba(255,255,255,.4);letter-spacing:3px;margin-bottom:6px}
-.mbtn{width:100%;max-width:290px;padding:15px;font-size:1.05rem;font-weight:700;
-  border:none;border-radius:50px;cursor:pointer;letter-spacing:.4px;
-  transition:transform .12s,filter .12s}
-.mbtn:active{transform:scale(.96)}
-.mbtn.pri{background:linear-gradient(135deg,#f5c320 0%,#e8960a 100%);
-  color:#1a1400;box-shadow:0 5px 22px rgba(245,195,32,.4),0 2px 0 #8a5500}
-.mbtn.sec{background:rgba(255,255,255,.1);color:#fff;
-  border:1.5px solid rgba(255,255,255,.25);box-shadow:0 2px 12px #0004}
-.mbtn.sec:active{filter:brightness(1.15)}
-.hv{font-size:.68rem;color:rgba(255,255,255,.22);margin-top:6px;letter-spacing:1px}
+  /* HOME */
+  #homeScreen {
+    background: radial-gradient(ellipse at 50% 30%, #2d6a4f 0%, #0d2b1a 100%);
+    gap: 20px;
+    padding: 20px;
+  }
+  .logo {
+    font-size: 3.5rem;
+    text-align: center;
+    line-height: 1;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  }
+  .game-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-align: center;
+    color: var(--gold);
+    text-shadow: 0 2px 10px rgba(244,162,97,0.4);
+  }
+  .game-subtitle { font-size: 0.85rem; opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; }
+  .menu-btns { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px; margin-top: 10px; }
+  .btn {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: #1a1a1a; box-shadow: 0 4px 15px rgba(244,162,97,0.35); }
+  .btn-secondary { background: rgba(255,255,255,0.1); color: var(--cream); border: 1.5px solid rgba(255,255,255,0.25); backdrop-filter: blur(5px); }
+  .btn-danger { background: linear-gradient(135deg, #c1121f, #9d0208); color: white; }
+  .btn-sm { padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; }
 
-/* ═══ MP SCREEN ═══ */
-#mp{position:relative;align-items:center;justify-content:flex-start;
-  gap:12px;overflow-y:auto;
-  background:radial-gradient(ellipse 90% 70% at 50% 35%,#195c30 0%,#061510 100%);
-  padding:60px 18px 28px}
-.mp-back{position:absolute;top:14px;left:14px;
-  background:rgba(0,0,0,.45);border:1.5px solid rgba(255,255,255,.18);
-  color:#fff;width:38px;height:38px;border-radius:50%;
-  font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.mp-ttl{font-size:1.35rem;font-weight:800;color:var(--gold);letter-spacing:1px}
-.mppan{width:100%;max-width:390px;background:rgba(0,0,0,.38);
-  border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:16px}
-.mppan h3{font-size:.85rem;opacity:.65;margin-bottom:10px;letter-spacing:.4px}
-.mpstt{font-size:.82rem;min-height:20px;opacity:.8;text-align:center;margin:4px 0}
-.codebox{background:rgba(0,0,0,.55);border:1px solid rgba(245,195,32,.35);
-  border-radius:12px;padding:12px;text-align:center;margin:8px 0}
-.codenum{font-size:2.3rem;font-weight:900;letter-spacing:8px;
-  color:var(--gold);text-shadow:0 0 24px rgba(245,195,32,.4)}
-.slots{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}
-.slot{padding:9px 7px;border-radius:10px;background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.1);text-align:center;font-size:.76rem;
-  color:rgba(255,255,255,.35)}
-.slot.you{border-color:#4caf50;color:#4caf50;background:rgba(76,175,80,.1)}
-.slot.in{border-color:var(--gold);color:var(--gold);background:rgba(245,195,32,.1)}
-.mpinput{width:100%;padding:11px 13px;font-size:1.3rem;letter-spacing:5px;
-  text-align:center;text-transform:uppercase;border-radius:10px;
-  border:1.5px solid rgba(255,255,255,.2);background:rgba(0,0,0,.45);
-  color:#fff;outline:none;margin:5px 0}
-.mpinput.nm{font-size:1rem;letter-spacing:1px}
-.mpinput:focus{border-color:var(--gold)}
-.mpinput::placeholder{opacity:.3;letter-spacing:1px}
-.mpbtn{width:100%;padding:11px;border-radius:10px;border:none;
-  font-size:.92rem;font-weight:700;cursor:pointer;margin-top:5px;
-  transition:filter .15s,transform .1s}
-.mpbtn:active{transform:scale(.97)}
-.mpbtn.g{background:linear-gradient(135deg,#f5c320,#e8960a);color:#1a1400}
-.mpbtn.o{background:transparent;color:rgba(255,255,255,.6);
-  border:1.5px solid rgba(255,255,255,.22)}
-.mpdiv{opacity:.3;font-size:.78rem;text-align:center;letter-spacing:1px}
+  /* GAME TABLE */
+  #gameScreen {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    justify-content: flex-start;
+  }
 
-/* ═══ GAME LAYOUT ═══ */
-#game{height:100%;height:100dvh;display:grid;grid-template-rows:42px 1fr;
-  background:radial-gradient(ellipse 95% 75% at 50% 38%,#1e5232 0%,#091e10 100%)}
+  /* Score bar */
+  .score-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    padding: 6px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
+  }
+  .score-player {
+    flex: 1;
+    text-align: center;
+    border-radius: 8px;
+    padding: 4px 2px;
+    border: 1.5px solid transparent;
+    transition: all 0.3s;
+  }
+  .score-player.active-turn { border-color: var(--gold); background: rgba(244,162,97,0.15); }
+  .score-player .sname { font-size: 0.62rem; opacity: 0.75; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+  .score-player .scall { font-size: 0.9rem; font-weight: 800; color: var(--gold); }
+  .score-player .swon { font-size: 0.7rem; opacity: 0.8; }
+  .score-player .stotal { font-size: 0.72rem; color: var(--green-light); font-weight: 700; }
 
-/* TOP BAR */
-.tbar{display:flex;align-items:center;justify-content:space-between;
-  padding:0 12px;background:rgba(0,0,0,.52);
-  border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;gap:8px}
-.tb-rnd{font-size:.8rem;font-weight:800;color:var(--gold);letter-spacing:.8px;white-space:nowrap}
-.tb-sc{display:flex;gap:8px;font-size:.7rem;overflow:hidden;flex:1;justify-content:center}
-.tb-sc span{opacity:.6;white-space:nowrap}
-.tb-sc .me{color:var(--gold);font-weight:700;opacity:1}
-.tb-ic{font-size:.85rem;cursor:pointer;opacity:.45;
-  padding:3px 6px;border-radius:6px;transition:opacity .15s;white-space:nowrap}
-.tb-ic:hover{opacity:.9}
+  /* Game area */
+  .game-area {
+    position: fixed;
+    top: 58px; bottom: 0; left: 0; right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+  }
 
-/* PLAY AREA */
-.play{display:grid;
-  grid-template-areas:".   top  ." "lft mid  rgt" ".   bot  .";
-  grid-template-rows:1fr auto 1fr;
-  grid-template-columns:auto 1fr auto;
-  gap:2px;padding:5px 5px 4px;overflow:hidden}
+  /* Opponent areas */
+  .opponent-top, .opponent-left, .opponent-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .opponents-row {
+    display: flex;
+    width: 100%;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .opp-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 80px;
+  }
+  .opp-label {
+    font-size: 0.62rem;
+    opacity: 0.7;
+    background: rgba(0,0,0,0.3);
+    padding: 2px 6px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .opp-cards { display: flex; }
 
-/* OPPONENT ZONES */
-.oz{display:flex;align-items:center;padding:3px}
-.oz.top{grid-area:top;flex-direction:column;justify-content:flex-end;gap:3px}
-.oz.lft{grid-area:lft;flex-direction:column;justify-content:center;gap:4px}
-.oz.rgt{grid-area:rgt;flex-direction:column;justify-content:center;gap:4px}
-.oz .pi{display:flex;flex-direction:column;align-items:center;gap:3px}
-.oz.lft .pi{flex-direction:row-reverse;gap:5px}
-.oz.rgt .pi{flex-direction:row;gap:5px}
+  /* Mini card (face down for opponents) */
+  .mini-card {
+    width: 20px;
+    height: 30px;
+    background: linear-gradient(135deg, #1e3a5f, #0d1b2a);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    margin: 0 -5px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+  .mini-card::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 2px;
+    background: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px);
+  }
 
-/* Player label */
-.plbl{font-size:.66rem;font-weight:700;white-space:nowrap;
-  padding:3px 9px;border-radius:20px;
-  background:rgba(0,0,0,.52);border:1px solid rgba(255,255,255,.1);
-  transition:background .2s,color .2s;line-height:1.4}
-.plbl .pb{color:rgba(255,255,255,.5);font-size:.58rem}
-.plbl.act{background:rgba(245,195,32,.88);color:#1a1400;border-color:var(--gold);
-  animation:gp 1.3s ease-in-out infinite}
-@keyframes gp{0%,100%{box-shadow:0 0 0 0 rgba(245,195,32,.5)}50%{box-shadow:0 0 0 7px rgba(245,195,32,0)}}
+  /* Center play area */
+  .play-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    min-height: 140px;
+  }
+  .played-cards {
+    position: relative;
+    width: 200px;
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .played-card-slot {
+    position: absolute;
+    transition: all 0.3s;
+  }
+  .played-card-slot[data-pos="top"] { top: 0; left: 50%; transform: translateX(-50%); }
+  .played-card-slot[data-pos="left"] { left: 0; top: 50%; transform: translateY(-50%); }
+  .played-card-slot[data-pos="right"] { right: 0; top: 50%; transform: translateY(-50%); }
+  .played-card-slot[data-pos="bottom"] { bottom: 0; left: 50%; transform: translateX(-50%); }
 
-/* Card backs */
-.backs{display:flex;position:relative}
-.oz.top .backs{flex-direction:row}
-.oz.lft .backs,.oz.rgt .backs{flex-direction:column}
-.cb{width:25px;height:36px;border-radius:5px;flex-shrink:0;
-  background:linear-gradient(145deg,#12356e 0%,#1d4da0 45%,#0c2858 100%);
-  border:1px solid rgba(255,255,255,.22);box-shadow:1px 1px 4px #0007}
-.oz.top .cb+.cb{margin-left:-17px}
-.oz.lft .cb+.cb,.oz.rgt .cb+.cb{margin-top:-28px}
+  /* Round info */
+  .round-info {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.6);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    text-align: center;
+    line-height: 1.2;
+    border: 1.5px solid rgba(244,162,97,0.4);
+    backdrop-filter: blur(5px);
+  }
 
-/* CENTER TABLE */
-.ctbl{grid-area:mid;position:relative;display:grid;
-  grid-template-areas:". t ." "l . r" ". b .";
-  grid-template-rows:1fr 1fr 1fr;grid-template-columns:1fr 1fr 1fr;
-  align-items:center;justify-items:center;min-width:150px;min-height:120px}
-.ctbl::before{content:'';position:absolute;inset:-6px;
-  border-radius:50%;border:2px dashed rgba(255,255,255,.07);pointer-events:none}
-.cs{display:flex;align-items:center;justify-content:center}
-.cs.t{grid-area:t}.cs.l{grid-area:l}.cs.r{grid-area:r}.cs.b{grid-area:b}
-.trick-msg{position:absolute;inset:0;display:flex;align-items:center;
-  justify-content:center;font-size:.9rem;font-weight:900;
-  color:var(--gold);text-shadow:0 2px 10px #0009;
-  opacity:0;transition:opacity .22s;pointer-events:none;text-align:center;padding:4px}
-.trick-msg.on{opacity:1}
+  /* Player hand */
+  .player-area {
+    width: 100%;
+    flex-shrink: 0;
+  }
+  .hand-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: relative;
+    height: 100px;
+    overflow: visible;
+  }
 
-/* MY AREA */
-.myarea{grid-area:bot;display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 4px 6px}
-.mylbl{font-size:.66rem;font-weight:700;padding:3px 9px;border-radius:20px;
-  background:rgba(0,0,0,.52);border:1px solid rgba(255,255,255,.1);
-  display:flex;align-items:center;gap:6px;line-height:1.4}
-.mylbl.act{background:rgba(245,195,32,.88);color:#1a1400;border-color:var(--gold);
-  animation:gp 1.3s ease-in-out infinite}
-.myhand{display:flex;flex-direction:row;align-items:flex-end;
-  justify-content:center;position:relative;min-height:70px}
-.myhand .card{margin:0 -13px}
-.myhand .card:first-child{margin-left:0}
-.myhand .card:last-child{margin-right:0}
+  /* Card styles */
+  .card {
+    width: 52px;
+    height: 76px;
+    background: white;
+    border-radius: 8px;
+    border: 1.5px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3px 4px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    box-shadow: 2px 3px 8px rgba(0,0,0,0.35);
+    flex-shrink: 0;
+  }
+  .card:active, .card.selected { transform: translateY(-15px) !important; box-shadow: 3px 8px 20px rgba(0,0,0,0.5) !important; }
+  .card.highlight { box-shadow: 0 0 12px rgba(244,162,97,0.8), 2px 3px 8px rgba(0,0,0,0.35) !important; }
+  .card.played-face-card {
+    width: 45px;
+    height: 64px;
+    cursor: default;
+  }
+  .card.played-face-card:active { transform: none !important; }
+  .card-rank { font-size: 0.75rem; font-weight: 800; line-height: 1; }
+  .card-suit { font-size: 0.8rem; line-height: 1; }
+  .card-center { font-size: 1.2rem; display: flex; align-items: center; justify-content: center; flex: 1; }
+  .card-corner-bl { display: flex; flex-direction: column; align-items: flex-end; transform: rotate(180deg); }
+  .red { color: var(--heart); }
+  .black { color: var(--spade); }
 
-/* ═══ CARDS ═══ */
-.card{width:46px;height:66px;border-radius:8px;background:#fff;
-  border:1.5px solid #ddd;
-  box-shadow:0 4px 14px var(--shadow);
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:space-between;padding:3px 4px;
-  font-size:.7rem;font-weight:800;position:relative;flex-shrink:0;
-  cursor:default;transition:transform .2s cubic-bezier(.34,1.6,.64,1),box-shadow .2s}
-.card .cr{line-height:1}
-.card .cs2{font-size:1.12rem}
-.card .crb{transform:rotate(180deg);line-height:1}
-.card.red{color:var(--red)}
-.card.blk{color:#111}
-.card.trump{border-color:#4466ff;border-width:2px;
-  box-shadow:0 0 0 2px #4466ff,0 4px 14px var(--shadow)}
+  /* Hand overlap */
+  .hand-card {
+    position: absolute;
+    bottom: 0;
+    transition: transform 0.2s;
+  }
+  .hand-card:hover .card { transform: translateY(-10px); }
 
-/* Played card (center) */
-.card.played{width:40px;height:57px;font-size:.63rem;cursor:default;
-  animation:cin .22s cubic-bezier(.34,1.4,.64,1)}
-.card.played .cs2{font-size:.9rem}
-@keyframes cin{from{transform:scale(.75) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  /* Status message */
+  .status-msg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid var(--gold);
+    border-radius: 16px;
+    padding: 16px 24px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+    z-index: 200;
+    max-width: 280px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    animation: fadeIn 0.3s;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -40%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 
-/* Selectable */
-.card.sel{cursor:pointer}
-.card.sel:hover{transform:translateY(-16px) scale(1.06);
-  box-shadow:0 12px 30px rgba(0,0,0,.65),0 0 0 2.5px var(--gold);z-index:20}
-.card.sel:active{transform:translateY(-9px) scale(1.02)}
+  /* BIDDING */
+  .bid-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bid-panel {
+    background: linear-gradient(135deg, #1a2f1a, #0d2b1a);
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 24px;
+    width: 90%;
+    max-width: 340px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .bid-title { font-size: 1.1rem; font-weight: 800; text-align: center; color: var(--gold); margin-bottom: 6px; }
+  .bid-subtitle { font-size: 0.78rem; opacity: 0.65; text-align: center; margin-bottom: 16px; }
+  .bid-cards-preview { display: flex; justify-content: center; gap: 4px; margin-bottom: 14px; flex-wrap: wrap; }
+  .bid-number-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+  .bid-num-btn {
+    aspect-ratio: 1;
+    border: 1.5px solid rgba(244,162,97,0.4);
+    border-radius: 10px;
+    background: rgba(244,162,97,0.08);
+    color: var(--cream);
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .bid-num-btn:hover, .bid-num-btn.selected { background: var(--gold); color: #1a1a1a; border-color: var(--gold); }
+  .bid-confirm { width: 100%; }
 
-/* Disabled */
-.card.dis{opacity:.32;cursor:not-allowed;filter:grayscale(.4)}
+  /* ROUND END */
+  .round-end-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .round-end-panel {
+    background: linear-gradient(135deg, #1a2f1a, #0d2b1a);
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 24px;
+    width: 92%;
+    max-width: 360px;
+  }
+  .round-end-title { font-size: 1.2rem; font-weight: 800; text-align: center; color: var(--gold); margin-bottom: 14px; }
+  .score-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .score-table th { padding: 6px 4px; text-align: center; opacity: 0.65; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .score-table td { padding: 7px 4px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .score-table .won-row { color: var(--green-light); font-weight: 700; }
+  .score-table .lost-row { color: #f87171; }
+  .round-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .round-actions .btn { flex: 1; }
 
-/* Trick chip */
-.tchip{display:inline-block;background:rgba(0,0,0,.5);border-radius:20px;
-  padding:1px 7px;font-size:.58rem;color:rgba(255,255,255,.75);margin-left:2px}
-.tchip.ok{color:#6dff9a}
-.tchip.bad{color:#ff7070}
+  /* GAME END */
+  .game-end-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .winner-banner { font-size: 2rem; text-align: center; }
+  .winner-name { font-size: 1.5rem; font-weight: 800; color: var(--gold); }
+  .final-scores { background: rgba(255,255,255,0.07); border-radius: 14px; padding: 16px; width: 90%; max-width: 320px; }
 
-/* ═══ BID SHEET (bottom) ═══ */
-.bsheet-wrap{position:fixed;inset:0;z-index:80;
-  display:flex;align-items:flex-end;justify-content:center;
-  background:rgba(0,0,0,.42);backdrop-filter:blur(3px)}
-.bsheet-wrap.hide{display:none}
-.bsheet{width:100%;max-width:490px;
-  background:linear-gradient(175deg,#1c4a2a 0%,#0b2315 100%);
-  border-radius:22px 22px 0 0;padding:14px 16px 28px;
-  border-top:1px solid rgba(255,255,255,.12);
-  box-shadow:0 -10px 40px rgba(0,0,0,.65);
-  animation:sup .28s cubic-bezier(.34,1.3,.64,1)}
-@keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.bsh-bar{width:34px;height:4px;background:rgba(255,255,255,.18);border-radius:2px;margin:0 auto 12px}
-.bsh-ttl{font-size:1.05rem;font-weight:800;color:var(--gold);text-align:center;margin-bottom:3px}
-.bsh-hint{font-size:.75rem;opacity:.6;text-align:center;margin-bottom:11px}
-.bsh-hand{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;
-  background:rgba(0,0,0,.25);border-radius:10px;padding:8px;margin-bottom:12px}
-.bgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px}
-.bbtn{padding:12px 0;font-size:1.2rem;font-weight:800;
-  border:1.5px solid rgba(255,255,255,.14);border-radius:9px;
-  cursor:pointer;background:rgba(255,255,255,.08);color:#fff;
-  transition:background .14s,border-color .14s,transform .1s}
-.bbtn:hover{background:rgba(245,195,32,.22);border-color:var(--gold)}
-.bbtn:active{transform:scale(.93)}
-.bbtn.pk{background:linear-gradient(135deg,#f5c320,#e8960a);color:#1a1400;border-color:var(--gold2)}
-.bconf{width:100%;padding:13px;border-radius:11px;border:none;
-  background:linear-gradient(135deg,#f5c320,#e8960a);color:#1a1400;
-  font-size:1rem;font-weight:800;cursor:pointer;
-  box-shadow:0 4px 18px rgba(245,195,32,.35);transition:filter .15s,transform .1s}
-.bconf:active{transform:scale(.97)}
-.bconf:disabled{opacity:.38;cursor:not-allowed;background:#555;color:#888;box-shadow:none}
+  /* MULTIPLAYER LOBBY */
+  #lobbyScreen { gap: 16px; padding: 20px; }
+  .lobby-title { font-size: 1.4rem; font-weight: 800; color: var(--gold); }
+  .lobby-panel { background: rgba(255,255,255,0.07); border-radius: 16px; padding: 16px; width: 100%; max-width: 340px; }
+  .lobby-panel h3 { font-size: 0.85rem; opacity: 0.7; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .room-input { width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: var(--cream); font-size: 1rem; outline: none; }
+  .room-input:focus { border-color: var(--gold); }
+  .room-code-display { font-size: 1.8rem; font-weight: 900; letter-spacing: 4px; color: var(--gold); text-align: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1.5px dashed rgba(244,162,97,0.4); }
+  .player-list { display: flex; flex-direction: column; gap: 8px; min-height: 100px; }
+  .player-slot { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.08); }
+  .player-slot.filled { border-color: rgba(82,183,136,0.4); background: rgba(82,183,136,0.08); }
+  .player-slot .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+  .player-slot.filled .dot { background: var(--green-light); }
+  .player-slot .pname { font-size: 0.9rem; }
+  .waiting-text { font-size: 0.78rem; opacity: 0.5; font-style: italic; }
 
-/* ═══ OVERLAYS ═══ */
-.ovl{position:fixed;inset:0;background:rgba(0,0,0,.72);
-  z-index:100;backdrop-filter:blur(5px);
-  display:flex;align-items:center;justify-content:center;padding:14px}
-.ovl.hide{display:none}
-.modal{background:linear-gradient(165deg,#1f5535 0%,#0a2015 100%);
-  border-radius:20px;padding:22px 18px;width:100%;max-width:390px;
-  border:1px solid rgba(255,255,255,.12);box-shadow:0 24px 70px rgba(0,0,0,.75);text-align:center}
-.modal h2{font-size:1.25rem;color:var(--gold);margin-bottom:5px;font-weight:800}
-.modal .sub{font-size:.8rem;opacity:.6;margin-bottom:12px}
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    z-index: 1000;
+    pointer-events: none;
+    animation: toastAnim 2.5s forwards;
+  }
+  @keyframes toastAnim {
+    0% { opacity: 0; bottom: 80px; }
+    15% { opacity: 1; bottom: 100px; }
+    75% { opacity: 1; }
+    100% { opacity: 0; }
+  }
 
-/* Score table */
-.stbl{width:100%;border-collapse:collapse;font-size:.8rem;margin:8px 0}
-.stbl th{background:rgba(0,0,0,.42);padding:8px 5px;color:var(--gold);font-size:.72rem}
-.stbl td{padding:7px 5px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center}
-.stbl .lead td{color:var(--gold);font-weight:700}
-.stbl .me td{background:rgba(245,195,32,.08)}
+  /* Trick winner animation */
+  .trick-flash {
+    position: fixed;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(244,162,97,0.8);
+    z-index: 250;
+    pointer-events: none;
+    animation: trickAnim 1.2s forwards;
+  }
+  @keyframes trickAnim {
+    0% { opacity: 0; transform: translate(-50%, -60%) scale(0.8); }
+    20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -40%) scale(1); }
+  }
 
-/* Round result */
-.rr{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;
-  font-size:.8rem;margin:8px 0;text-align:left}
-.rrhd{font-size:.67rem;opacity:.5;padding:2px 0}
-.rrn,.rrbid,.rrsco{padding:5px 6px;border-radius:6px}
-.rrn{opacity:.9}.rrbid{text-align:center;opacity:.8}
-.rrsco{text-align:right;font-weight:800}
-.rr-pos{color:#58ff8a}.rr-neg{color:#ff6060}
-.me-row .rrn,.me-row .rrbid,.me-row .rrsco{background:rgba(245,195,32,.1)}
+  /* Spade trump indicator */
+  .trump-indicator {
+    position: fixed;
+    top: 62px;
+    right: 8px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 101;
+  }
 
-.mbtn2{width:100%;padding:13px;border-radius:11px;border:none;
-  background:linear-gradient(135deg,#f5c320,#e8960a);color:#1a1400;
-  font-size:.98rem;font-weight:800;cursor:pointer;margin-top:9px;
-  box-shadow:0 4px 18px rgba(245,195,32,.3);transition:filter .15s,transform .1s}
-.mbtn2:active{transform:scale(.97)}
-.mbtn2.ol{background:transparent;color:rgba(255,255,255,.6);
-  border:1.5px solid rgba(255,255,255,.2);box-shadow:none}
+  /* Menu btn */
+  .menu-btn-game {
+    position: fixed;
+    top: 62px;
+    left: 8px;
+    background: rgba(0,0,0,0.5);
+    border: none;
+    color: white;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    z-index: 101;
+  }
 
-/* Rules */
-.rules-sc{text-align:left;font-size:.82rem;line-height:1.78;opacity:.88;
-  max-height:56vh;overflow-y:auto;padding-right:4px;margin-top:8px}
-.rules-sc::-webkit-scrollbar{width:3px}
-.rules-sc::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:2px}
-.rh{color:var(--gold);font-weight:700;display:block;margin-top:10px}
+  /* Round indicator */
+  .round-badge {
+    position: fixed;
+    top: 62px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+    padding: 3px 10px;
+    font-size: 0.72rem;
+    opacity: 0.8;
+    z-index: 101;
+  }
 
-/* ═══ TRUMP INDICATOR ═══ */
-.trump-ind{position:absolute;bottom:4px;right:6px;
-  font-size:.62rem;opacity:.55;pointer-events:none}
-
-/* ═══ PLAY HINT BANNER ═══ */
-.hint-banner{position:absolute;top:0;left:0;right:0;
-  background:rgba(245,195,32,.92);color:#1a1400;
-  font-size:.72rem;font-weight:700;text-align:center;
-  padding:4px 8px;z-index:10;
-  opacity:0;transition:opacity .3s;pointer-events:none;border-radius:6px 6px 0 0}
-.hint-banner.on{opacity:1}
-
-/* ═══ TOAST ═══ */
-.toast{position:fixed;top:52px;left:50%;
-  transform:translateX(-50%) translateY(-18px);
-  background:rgba(8,8,8,.9);color:#fff;padding:8px 20px;
-  border-radius:30px;font-size:.84rem;font-weight:600;
-  z-index:300;opacity:0;transition:transform .25s,opacity .25s;
-  white-space:nowrap;border:1px solid rgba(255,255,255,.1);pointer-events:none}
-.toast.on{transform:translateX(-50%) translateY(0);opacity:1}
-
-/* ═══ INSTALL BANNER ═══ */
-#ib{position:fixed;bottom:0;left:0;right:0;
-  background:linear-gradient(90deg,#f5c320,#e8960a);color:#1a1400;
-  padding:11px 16px;display:flex;align-items:center;justify-content:space-between;
-  font-weight:700;font-size:.85rem;z-index:200;
-  transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.3,.64,1)}
-#ib.on{transform:translateY(0)}
-#ib button{background:#1a1400;color:var(--gold);border:none;
-  padding:6px 14px;border-radius:20px;font-weight:700;cursor:pointer;font-size:.82rem}
-#ib-x{background:transparent !important;color:rgba(0,0,0,.5) !important;font-size:1rem;padding:3px 7px !important}
+  @media (max-width: 360px) {
+    .card { width: 44px; height: 64px; }
+    .card-rank { font-size: 0.65rem; }
+    .card-center { font-size: 1rem; }
+  }
 </style>
 </head>
 <body>
 
-<!-- ════ HOME ════ -->
-<div id="home" class="scr on">
-  <div>
-    <div class="logo-suits"><span class="suit-s">♠</span><span class="suit-h">♥</span><span class="suit-d">♦</span><span class="suit-c">♣</span></div>
-    <div class="logo-h">CALL BREAK</div>
-    <div class="logo-hi">कॉल ब्रेक</div>
+<!-- HOME SCREEN -->
+<div id="homeScreen" class="screen active">
+  <div class="logo">🃏♠️♥️</div>
+  <div class="game-title">CALL BREAK</div>
+  <div class="game-subtitle">Card Game</div>
+  <div class="menu-btns">
+    <button class="btn btn-primary" onclick="startComputerGame()">🤖 Computer के साथ खेलें</button>
+    <button class="btn btn-secondary" onclick="showLobby()">👥 Friends के साथ खेलें</button>
+    <button class="btn btn-secondary" onclick="showRules()">📖 Rules देखें</button>
   </div>
-  <button class="mbtn pri" onclick="startSolo()">🤖 &nbsp;Computer के साथ खेलें</button>
-  <button class="mbtn sec" onclick="goMp()">👥 &nbsp;दोस्तों के साथ खेलें</button>
-  <button class="mbtn sec" onclick="goRules()">📖 &nbsp;Rules देखें</button>
-  <div class="hv">v3.0 • Official Call Break Rules</div>
+  <div style="margin-top:12px; font-size:0.7rem; opacity:0.4;">Trump हमेशा ♠ Spade होता है</div>
 </div>
 
-<!-- ════ MULTIPLAYER ════ -->
-<div id="mp" class="scr">
-  <button class="mp-back" onclick="goHome()">←</button>
-  <div class="mp-ttl">👥 Multiplayer</div>
-  <div class="mppan">
-    <h3>🏠 Host — नया Room बनाएं</h3>
-    <div class="mpstt" id="hstt">🔄 Connecting...</div>
-    <div class="codebox" id="hcbox" style="display:none">
-      <div class="codenum" id="hcnum"></div>
-      <div style="font-size:.68rem;opacity:.45;margin-top:3px">यह code दोस्तों को दें</div>
-    </div>
-    <div class="slots" id="hslots" style="display:none"></div>
-    <button class="mpbtn g" id="hstrt" style="display:none" onclick="startMpGame()">🎮 Game शुरू करें</button>
-    <button class="mpbtn o" id="hcopy" style="display:none" onclick="copyCode()">📋 Code Copy करें</button>
+<!-- LOBBY SCREEN -->
+<div id="lobbyScreen" class="screen">
+  <div class="lobby-title">👥 Friends के साथ खेलें</div>
+
+  <div class="lobby-panel">
+    <h3>नया कमरा बनाएं</h3>
+    <input class="room-input" id="hostName" placeholder="आपका नाम लिखें" maxlength="15">
+    <br><br>
+    <button class="btn btn-primary" style="width:100%" onclick="createRoom()">🏠 Room बनाएं</button>
   </div>
-  <div class="mpdiv">— या —</div>
-  <div class="mppan">
-    <h3>🔗 Join करें</h3>
-    <input class="mpinput" id="jcode" type="text" placeholder="ROOM CODE" maxlength="6">
-    <input class="mpinput nm" id="jname" type="text" placeholder="आपका नाम" maxlength="12">
-    <button class="mpbtn g" onclick="joinRoom()">🎯 Join करें</button>
-    <div class="mpstt" id="jstt"></div>
+
+  <div style="font-size:0.8rem; opacity:0.5;">— या —</div>
+
+  <div class="lobby-panel">
+    <h3>Room में Join करें</h3>
+    <input class="room-input" id="joinName" placeholder="आपका नाम" maxlength="15" style="margin-bottom:8px">
+    <input class="room-input" id="joinCode" placeholder="Room Code डालें" maxlength="6" style="text-transform:uppercase; margin-bottom:8px">
+    <button class="btn btn-secondary" style="width:100%" onclick="joinRoom()">🚪 Join करें</button>
   </div>
+
+  <button class="btn btn-secondary btn-sm" onclick="showScreen('homeScreen')">← वापस</button>
 </div>
 
-<!-- ════ GAME ════ -->
-<div id="game" class="scr">
-  <div class="tbar">
-    <div class="tb-rnd" id="tb-rnd">Round 1/5</div>
-    <div class="tb-sc"  id="tb-sc"></div>
-    <div class="tb-ic" onclick="viewScore()">📊 Score</div>
+<!-- ROOM WAITING SCREEN -->
+<div id="roomScreen" class="screen">
+  <div class="lobby-title">🏠 Room Ready है!</div>
+  <div class="lobby-panel">
+    <h3>Room Code - दोस्तों को Share करें</h3>
+    <div class="room-code-display" id="roomCodeDisplay">------</div>
+    <br>
+    <button class="btn btn-secondary btn-sm" style="width:100%" onclick="copyRoomLink()">📋 Link Copy करें</button>
   </div>
-  <div class="play">
-    <!-- Top (seat+2) -->
-    <div class="oz top" id="oz2">
-      <div class="pi"><div class="plbl" id="lbl2">P2</div><div class="backs" id="bk2"></div></div>
-    </div>
-    <!-- Left (seat+3) -->
-    <div class="oz lft" id="oz3">
-      <div class="pi"><div class="backs" id="bk3"></div><div class="plbl" id="lbl3">P3</div></div>
-    </div>
-    <!-- Center -->
-    <div class="ctbl" id="ctbl">
-      <div class="cs t" id="cs2"></div>
-      <div class="cs l" id="cs3"></div>
-      <div class="cs r" id="cs1"></div>
-      <div class="cs b" id="cs0"></div>
-      <div class="trick-msg" id="tmsg"></div>
-      <div class="trump-ind">♠ Trump</div>
-    </div>
-    <!-- Right (seat+1) -->
-    <div class="oz rgt" id="oz1">
-      <div class="pi"><div class="plbl" id="lbl1">P1</div><div class="backs" id="bk1"></div></div>
-    </div>
-    <!-- My hand -->
-    <div class="myarea">
-      <div class="mylbl" id="mylbl">आप</div>
-      <div class="myhand" id="myhand"></div>
-    </div>
+  <div class="lobby-panel">
+    <h3>Players (<span id="playerCount">1</span>/4)</h3>
+    <div class="player-list" id="playerList"></div>
   </div>
+  <div id="startGameBtn" style="display:none; width:90%; max-width:340px;">
+    <button class="btn btn-primary" style="width:100%" onclick="startMultiplayerGame()">🎮 Game शुरू करें</button>
+  </div>
+  <div class="waiting-text" id="waitingText">3 और players का इंतज़ार है...</div>
+  <button class="btn btn-secondary btn-sm" onclick="leaveRoom()">← वापस</button>
 </div>
 
-<!-- ════ BID SHEET ════ -->
-<div class="bsheet-wrap hide" id="bsw">
-  <div class="bsheet">
-    <div class="bsh-bar"></div>
-    <div class="bsh-ttl">🎯 अपना Bid लगाएं</div>
-    <div class="bsh-hint" id="bshint">आप कितने tricks जीतेंगे?</div>
-    <div class="bsh-hand" id="bsh-hand"></div>
-    <div class="bgrid" id="bgrid"></div>
-    <button class="bconf" id="bconfbtn" onclick="confirmBid()" disabled>
-      पहले number select करें
-    </button>
-  </div>
-</div>
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen">
+  <!-- Score bar -->
+  <div class="score-bar" id="scoreBar"></div>
+  <button class="menu-btn-game" onclick="confirmQuit()">☰</button>
+  <div class="round-badge" id="roundBadge">Round 1/5</div>
+  <div class="trump-indicator">♠ Trump</div>
 
-<!-- ════ SCORE OVERLAY ════ -->
-<div class="ovl hide" id="scov">
-  <div class="modal">
-    <h2 id="sc-ttl">Round Result</h2>
-    <div class="rr" id="rrgrid"></div>
-    <table class="stbl" id="stbl"></table>
-    <button class="mbtn2" id="nxtbtn" onclick="nextRound()">▶ अगला Round</button>
-    <button class="mbtn2 ol" onclick="closeScore()">✕ बंद करें</button>
-  </div>
-</div>
-
-<!-- ════ RULES OVERLAY ════ -->
-<div class="ovl hide" id="rulov">
-  <div class="modal">
-    <h2>📖 Call Break — Official Rules</h2>
-    <div class="rules-sc">
-      <span class="rh">🎯 उद्देश्य</span>
-      5 rounds में सबसे ज़्यादा score बनाएं।
-
-      <span class="rh">🃏 Cards</span>
-      52 cards, 4 players — हर player को 13 cards मिलते हैं। Cards एक-एक करके बांटे जाते हैं।
-
-      <span class="rh">♠ Trump — सबसे ज़रूरी Rule</span>
-      Spades (♠) हमेशा trump होते हैं। कोई भी ♠ card किसी भी दूसरे suit के card को हरा सकता है।
-      Blue border वाले cards ♠ trump हैं।
-
-      <span class="rh">🤙 Bidding (Calling)</span>
-      • हर player बारी-बारी bid लगाता है<br>
-      • Minimum bid: 1 (कोई भी 0 bid नहीं कर सकता)<br>
-      • Maximum bid: 13<br>
-      • आप जितने tricks जीतने का भरोसा हो उतना bid करें
-
-      <span class="rh">▶ Card खेलने के Rules (Priority Order)</span>
-      <strong>Rule 1:</strong> अगर lead suit (जो पहले खेला गया) आपके पास है →
-      वही suit खेलनी होगी, कोई और नहीं।<br><br>
-      <strong>Rule 2:</strong> अगर lead suit नहीं है और अभी trick में ♠ नहीं खेला गया →
-      ♠ Spade खेलना होगा (अगर आपके पास है)।<br><br>
-      <strong>Rule 3 (Over-Trump Rule):</strong> अगर lead suit नहीं है और trick में ♠ पहले से खेला जा चुका है →<br>
-      &nbsp;&nbsp;• अगर उससे बड़ा ♠ trump आपके पास है → वह बड़ा trump खेलना होगा<br>
-      &nbsp;&nbsp;• अगर बड़ा trump नहीं है → कोई भी card खेल सकते हैं (छोटा trump भी नहीं खेलना ज़रूरी)<br><br>
-      <strong>Rule 4:</strong> अगर lead suit और ♠ दोनों नहीं → कोई भी card।
-
-      <span class="rh">🏆 Trick कौन जीतता है</span>
-      • सबसे ऊंचा ♠ trump जीतता है<br>
-      • अगर कोई ♠ नहीं खेला → सबसे ऊंचा lead suit card जीतता है<br>
-      • Card rank: A &gt; K &gt; Q &gt; J &gt; 10 &gt; 9 &gt; 8 &gt; 7 &gt; 6 &gt; 5 &gt; 4 &gt; 3 &gt; 2
-
-      <span class="rh">💯 Scoring</span>
-      ✅ Bid पूरा किया: <strong>+bid + 0.1 × extra tricks</strong><br>
-      &nbsp;&nbsp;Example: bid 4, जीते 6 → score = +4.2<br>
-      ❌ Bid पूरा नहीं: <strong>−bid</strong><br>
-      &nbsp;&nbsp;Example: bid 4, जीते 2 → score = −4
+  <!-- Game area -->
+  <div class="game-area">
+    <!-- Top + side opponents -->
+    <div class="opponents-row">
+      <div class="opp-area" id="oppLeft">
+        <div class="opp-label" id="nameLeft">P2</div>
+        <div class="opp-cards" id="cardsLeft"></div>
+      </div>
+      <div class="opp-area" id="oppTop">
+        <div class="opp-label" id="nameTop">P3</div>
+        <div class="opp-cards" id="cardsTop"></div>
+      </div>
+      <div class="opp-area" id="oppRight">
+        <div class="opp-label" id="nameRight">P4</div>
+        <div class="opp-cards" id="cardsRight"></div>
+      </div>
     </div>
-    <button class="mbtn2" onclick="closeRules()">✕ बंद करें</button>
+
+    <!-- Center play area -->
+    <div class="play-area">
+      <div class="played-cards" id="playedCards">
+        <div class="played-card-slot" data-pos="top" id="slotTop"></div>
+        <div class="played-card-slot" data-pos="left" id="slotLeft"></div>
+        <div class="played-card-slot" data-pos="right" id="slotRight"></div>
+        <div class="played-card-slot" data-pos="bottom" id="slotBottom"></div>
+        <div class="round-info" id="roundInfo">Trick<br>1/13</div>
+      </div>
+    </div>
+
+    <!-- Player hand -->
+    <div class="player-area">
+      <div class="hand-container" id="handContainer"></div>
+    </div>
   </div>
 </div>
 
-<!-- Toast & Install banner -->
-<div class="toast" id="toast"></div>
-<div id="ib">
-  <span>📱 App Install करें — Mobile पर!</span>
-  <div style="display:flex;gap:6px">
-    <button onclick="instApp()">Install</button>
-    <button id="ib-x" onclick="dimissInst()">✕</button>
+<!-- RULES SCREEN -->
+<div id="rulesScreen" class="screen" style="overflow-y:auto; justify-content:flex-start; padding:20px; gap:12px;">
+  <div style="font-size:1.3rem; font-weight:800; color:var(--gold);">📖 Call Break Rules</div>
+  <div style="background:rgba(255,255,255,0.07); border-radius:14px; padding:16px; max-width:400px; width:100%; font-size:0.85rem; line-height:1.7; opacity:0.9;">
+    <p><strong style="color:var(--gold);">🃏 Basic Rules:</strong></p>
+    <p>• 4 Players, 52 cards, 5 Rounds होते हैं</p>
+    <p>• हर Round में 13 tricks होती हैं</p>
+    <p>• <strong>♠ Spade हमेशा Trump</strong> होता है</p>
+    <br>
+    <p><strong style="color:var(--gold);">📣 Bidding (Call):</strong></p>
+    <p>• हर Round शुरू में players अपनी Call करते हैं (1-8)</p>
+    <p>• Call का मतलब है - मैं इतनी Tricks जीतूंगा</p>
+    <p>• Minimum Call 1 होती है</p>
+    <br>
+    <p><strong style="color:var(--gold);">🎮 Playing:</strong></p>
+    <p>• पहला card जो भी suit का हो, बाकी वही suit खेलें</p>
+    <p>• अगर वो suit नहीं है तो कोई भी card खेल सकते हैं</p>
+    <p>• ♠ Spade (Trump) किसी भी suit को हरा देता है</p>
+    <p>• Highest card या Highest Trump जीतता है</p>
+    <br>
+    <p><strong style="color:var(--gold);">📊 Scoring:</strong></p>
+    <p>• Call के बराबर या ज़्यादा tricks जीतें → Call × 1 points मिलते हैं</p>
+    <p>• अगर Call से कम tricks जीतें → Call × (-1) points कटते हैं</p>
+    <p>• Extra tricks → +0.1 per extra trick</p>
+    <p>• 5 Rounds के बाद highest score वाला जीतता है</p>
   </div>
+  <button class="btn btn-secondary" onclick="showScreen('homeScreen')">← वापस</button>
 </div>
+
+<!-- OVERLAY ELEMENTS (rendered dynamically) -->
 
 <script>
-/* ════════════════════════════════════════
-   CONSTANTS
-════════════════════════════════════════ */
-const SUITS   = ['♠','♥','♦','♣'];
-const RANKS   = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-const RV      = {2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
-const TRUMP   = '♠';
-const NROUNDS = 5;
-const AIDELAY = 900;
-const DEFNAMES= ['आप','Rahul','Priya','Amit'];
+// ============================================================
+// CARD GAME ENGINE
+// ============================================================
+const SUITS = ['♠', '♥', '♦', '♣'];
+const RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+const SUIT_SYMBOLS = { '♠': '♠', '♥': '♥', '♦': '♦', '♣': '♣' };
+const TRUMP = '♠';
 
-let G = {};
+function suitColor(suit) { return (suit === '♥' || suit === '♦') ? 'red' : 'black'; }
+function rankVal(rank) { return RANKS.indexOf(rank); }
+function cardStr(c) { return c.rank + c.suit; }
 
-function initG(mode, myName, isHost){
-  G = {
-    mode, isHost,
-    round:1, phase:'bid',
-    hands:[[],[],[],[]],
-    bids:[0,0,0,0], tricks:[0,0,0,0], total:[0,0,0,0],
-    trick:[], cur:0, leadPlayer:0, trickNum:0,
-    myIdx:0, names:[...DEFNAMES],
-    selBid:null, bidsDone:0,
-    peer:null, peers:{}, myName:myName||'आप', roomCode:null, mpPlayers:[]
-  };
-  if(myName) G.names[0]=myName;
+function createDeck() {
+  const deck = [];
+  for (const suit of SUITS)
+    for (const rank of RANKS)
+      deck.push({ suit, rank });
+  return deck;
 }
 
-/* ════════════════════════════════════════
-   DECK & DEAL
-════════════════════════════════════════ */
-const makeDeck = ()=> SUITS.flatMap(s=>RANKS.map(r=>({suit:s,rank:r})));
-
-function shuffle(a){
-  for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];}
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
   return a;
 }
 
-function deal(){
-  const deck=shuffle(makeDeck());
-  G.hands=[[],[],[],[]];
-  deck.forEach((c,i)=>G.hands[i%4].push(c));
-  G.hands.forEach((_,p)=>sortH(p));
+function dealCards() {
+  const deck = shuffle(createDeck());
+  return [deck.slice(0,13), deck.slice(13,26), deck.slice(26,39), deck.slice(39,52)];
 }
 
-function sortH(p){
-  const so={'♠':0,'♥':1,'♦':2,'♣':3};
-  G.hands[p].sort((a,b)=>so[a.suit]-so[b.suit]||RV[b.rank]-RV[a.rank]);
-}
-
-/* ════════════════════════════════════════
-   CARD ELEMENTS
-════════════════════════════════════════ */
-function mkCard(card,{played=false,sel=false,dis=false,small=false,onClick=null}={}){
-  const red   = card.suit==='♥'||card.suit==='♦';
-  const trump = card.suit===TRUMP;
-  const el    = document.createElement('div');
-  el.className=['card',red?'red':'blk',trump?'trump':'',
-    played?'played':'',sel?'sel':'',dis?'dis':''].filter(Boolean).join(' ');
-  if(small){el.style.width='34px';el.style.height='50px';el.style.fontSize='.6rem';}
-  el.innerHTML=`<span class="cr">${card.rank}</span><span class="cs2">${card.suit}</span><span class="crb">${card.rank}</span>`;
-  if(onClick&&sel) el.addEventListener('click',onClick);
-  return el;
-}
-
-function mkBack(){
-  const e=document.createElement('div');e.className='cb';return e;
-}
-
-/* ════════════════════════════════════════
-   RENDER
-════════════════════════════════════════ */
-function renderAll(){ renderBar(); renderOpps(); renderMine(); renderCenter(); }
-
-function renderBar(){
-  document.getElementById('tb-rnd').textContent=`Round ${G.round}/${NROUNDS}`;
-  document.getElementById('tb-sc').innerHTML=G.total.map((s,i)=>
-    `<span class="${i===G.myIdx?'me':''}">${G.names[i]}: ${s.toFixed(1)}</span>`
-  ).join('');
-}
-
-function renderOpps(){
-  [1,2,3].forEach(rel=>{
-    const p=(G.myIdx+rel)%4;
-    const isAct=G.cur===p&&G.phase==='play';
-    const bks=document.getElementById(`bk${rel}`);
-    const lbl=document.getElementById(`lbl${rel}`);
-    const bt = G.phase==='play'
-      ? `<span class="tchip ${G.tricks[p]>=G.bids[p]?'ok':'bad'}">${G.tricks[p]}/${G.bids[p]}</span>`
-      : (G.bids[p]>0?`<span class="tchip">${G.bids[p]}</span>`:'');
-    lbl.innerHTML=G.names[p]+bt;
-    lbl.className='plbl'+(isAct?' act':'');
-    bks.innerHTML='';
-    const n=Math.min(G.hands[p].length,rel===2?8:5);
-    for(let i=0;i<n;i++) bks.appendChild(mkBack());
-  });
-}
-
-function renderMine(){
-  const p=G.myIdx;
-  const hand=document.getElementById('myhand');
-  hand.innerHTML='';
-  const isMyTurn=G.cur===p&&G.phase==='play';
-  const valid=isMyTurn?getValid(p):[];
-  const lbl=document.getElementById('mylbl');
-  const bt = G.phase==='play'
-    ? `<span class="tchip ${G.tricks[p]>=G.bids[p]?'ok':'bad'}">${G.tricks[p]}/${G.bids[p]}</span>`
-    : (G.bids[p]>0?`<span class="tchip">${G.bids[p]}</span>`:'');
-  lbl.innerHTML=G.names[p]+bt;
-  lbl.className='mylbl'+(isMyTurn?' act':'');
-  G.hands[p].forEach(c=>{
-    const ok=valid.some(v=>v.suit===c.suit&&v.rank===c.rank);
-    const el=mkCard(c,{sel:isMyTurn&&ok,dis:isMyTurn&&!ok,onClick:isMyTurn&&ok?()=>playCard(p,c):null});
-    hand.appendChild(el);
-  });
-}
-
-function renderCenter(){
-  [0,1,2,3].forEach(p=>{
-    const sl=document.getElementById(`cs${p}`);
-    sl.innerHTML='';
-    const e=G.trick.find(x=>x.player===p);
-    if(e) sl.appendChild(mkCard(e.card,{played:true}));
-  });
-}
-
-/* ════════════════════════════════════════
-   GAME FLOW
-════════════════════════════════════════ */
-function startSolo(){ initG('solo',null,true); showScr('game'); startRound(); }
-
-function startRound(){
-  G.bids=[0,0,0,0]; G.tricks=[0,0,0,0]; G.trick=[]; G.bidsDone=0;
-  G.selBid=null; G.phase='bid'; G.cur=G.leadPlayer; G.trickNum=0;
-  deal(); renderAll();
-  // Show cards first, then start bidding after 700ms
-  setTimeout(startBidding,700);
-}
-
-function startBidding(){ G.phase='bid'; G.bidsDone=0; G.cur=G.leadPlayer; processBid(); }
-
-function processBid(){
-  if(G.bidsDone>=4){
-    G.phase='play'; G.cur=G.leadPlayer; renderAll();
-    showToast(G.names.map((n,i)=>`${n}:${G.bids[i]}`).join(' | '),2400);
-    setTimeout(startPlay,700); return;
-  }
-  const p=(G.leadPlayer+G.bidsDone)%4;
-  G.cur=p;
-  if(p===G.myIdx){ showBidSheet(); return; }
-  setTimeout(()=>{ G.bids[p]=aiBid(p); G.bidsDone++; renderAll(); processBid(); },400);
-}
-
-function showBidSheet(){
-  const my=G.myIdx;
-  const trumps=G.hands[my].filter(c=>c.suit===TRUMP).length;
-  const aces=G.hands[my].filter(c=>c.suit!==TRUMP&&c.rank==='A').length;
-  document.getElementById('bshint').textContent=
-    `आपके पास ${trumps} ♠ Spades और ${aces} Aces हैं`;
-
-  // Show your cards in bid sheet
-  const bsh=document.getElementById('bsh-hand');
-  bsh.innerHTML='';
-  G.hands[my].forEach(c=>bsh.appendChild(mkCard(c,{small:true})));
-
-  const grid=document.getElementById('bgrid');
-  grid.innerHTML='';
-  G.selBid=null;
-  const btn=document.getElementById('bconfbtn');
-  btn.disabled=true;
-  btn.textContent='पहले number select करें';
-
-  for(let i=1;i<=13;i++){
-    const b=document.createElement('button');
-    b.className='bbtn'; b.textContent=i;
-    b.onclick=()=>{
-      document.querySelectorAll('.bbtn').forEach(x=>x.classList.remove('pk'));
-      b.classList.add('pk'); G.selBid=i;
-      btn.disabled=false; btn.textContent=`✅ ${i} Tricks का Bid Confirm करें`;
-    };
-    grid.appendChild(b);
-  }
-  document.getElementById('bsw').classList.remove('hide');
-}
-
-function confirmBid(){
-  if(!G.selBid) return;
-  document.getElementById('bsw').classList.add('hide');
-  G.bids[G.myIdx]=G.selBid; G.bidsDone++; renderAll(); processBid();
-}
-
-function startPlay(){ G.phase='play'; G.trick=[]; processPlay(); }
-
-function processPlay(){
-  if(G.cur===G.myIdx){ renderAll(); return; }
-  const ms=G.trick.length===0?700:AIDELAY;
-  setTimeout(()=>{ playCard(G.cur,aiPlay(G.cur)); },ms);
-}
-
-function playCard(player,card){
-  if(G.phase!=='play'||G.cur!==player) return;
-  const idx=G.hands[player].findIndex(c=>c.suit===card.suit&&c.rank===card.rank);
-  if(idx<0) return;
-  G.hands[player].splice(idx,1);
-  G.trick.push({player,card});
-  renderAll();
-  if(G.trick.length<4){ G.cur=(G.cur+1)%4; processPlay(); }
-  else setTimeout(resolveTrick,550);
-}
-
-function resolveTrick(){
-  const w=trickWinner(G.trick);
-  G.tricks[w]++; G.trickNum++;
-  const msg=document.getElementById('tmsg');
-  msg.textContent=`${G.names[w]} ने जीता! 🏆`;
-  msg.classList.add('on');
-  setTimeout(()=>{
-    msg.classList.remove('on');
-    G.trick=[]; G.cur=w; G.leadPlayer=w;
-    if(G.trickNum>=13) setTimeout(endRound,450);
-    else{ renderAll(); processPlay(); }
-  },1150);
-}
-
-function trickWinner(trick){
-  const ls=trick[0].card.suit;
-  let best=trick[0];
-  for(let i=1;i<trick.length;i++) if(beats(trick[i].card,best.card,ls)) best=trick[i];
-  return best.player;
-}
-
-function beats(ch,cur,ls){
-  const ct=ch.suit===TRUMP,xt=cur.suit===TRUMP;
-  const cl=ch.suit===ls,xl=cur.suit===ls;
-  if(ct&&!xt) return true;
-  if(!ct&&xt) return false;
-  if(ct&&xt)  return RV[ch.rank]>RV[cur.rank];
-  if(cl&&!xl) return true;
-  if(!cl&&xl) return false;
-  return RV[ch.rank]>RV[cur.rank];
-}
-
-/* ════════════════════════════════════════
-   OFFICIAL CALL BREAK — VALID CARD RULES
-   ─────────────────────────────────────
-   Priority 1: Must follow led suit
-   Priority 2: No led suit + no trump played yet
-               → Must play trump if available
-   Priority 3: No led suit + trump already played
-               → Must over-trump if higher trump available
-               → Otherwise: completely free (any card)
-   Priority 4: No led suit, no trump → any card
-════════════════════════════════════════ */
-function getValid(player){
-  const hand=G.hands[player];
-  if(G.trick.length===0) return hand;   // Leading: any card allowed
-
-  const leadSuit=G.trick[0].card.suit;
-
-  // Priority 1: Must follow led suit
-  const suitCards=hand.filter(c=>c.suit===leadSuit);
-  if(suitCards.length>0) return suitCards;
-
-  // No led suit cards — check trump situation
-  const trumpsPlayed=G.trick.filter(e=>e.card.suit===TRUMP);
-
-  if(trumpsPlayed.length===0){
-    // Priority 2: No trump played yet → must play trump if available
-    const myTrumps=hand.filter(c=>c.suit===TRUMP);
-    if(myTrumps.length>0) return myTrumps;
-    return hand;  // No trump available → any card
-  } else {
-    // Priority 3: Trump already played → Over-Trump Rule
-    // Find highest trump currently in trick
-    const bestTrumpVal=Math.max(...trumpsPlayed.map(e=>RV[e.card.rank]));
-    // Player must play a HIGHER trump if they have one
-    const higherTrumps=hand.filter(c=>c.suit===TRUMP&&RV[c.rank]>bestTrumpVal);
-    if(higherTrumps.length>0) return higherTrumps;
-    // Cannot over-trump → completely free choice (any card)
-    return hand;
-  }
-}
-
-/* ════════════════════════════════════════
-   SCORING
-════════════════════════════════════════ */
-function endRound(){
-  const rs=G.bids.map((bid,p)=>{
-    const t=G.tricks[p];
-    const s=t>=bid ? +(bid+(t-bid)*.1).toFixed(1) : -bid;
-    G.total[p]=+(G.total[p]+s).toFixed(1);
-    return s;
-  });
-  showResult(rs);
-}
-
-function showResult(rs){
-  const ov=document.getElementById('scov');
-  const tt=document.getElementById('sc-ttl');
-  const rg=document.getElementById('rrgrid');
-  const st=document.getElementById('stbl');
-  const nb=document.getElementById('nxtbtn');
-
-  tt.textContent=`Round ${G.round} खत्म! 🎉`;
-
-  rg.innerHTML=`
-    <div class="rrhd">Player</div><div class="rrhd" style="text-align:center">Bid / Tricks</div><div class="rrhd" style="text-align:right">Points</div>
-    ${[0,1,2,3].map(p=>`
-      <div class="rrn${p===G.myIdx?' me-row':''}">${G.names[p]}${p===G.myIdx?' ★':''}</div>
-      <div class="rrbid${p===G.myIdx?' me-row':''}">${G.bids[p]} / ${G.tricks[p]}</div>
-      <div class="rrsco${p===G.myIdx?' me-row':''} ${rs[p]>=0?' rr-pos':' rr-neg'}">${rs[p]>=0?'+':''}${rs[p].toFixed(1)}</div>
-    `).join('')}
-  `;
-
-  const sorted=[0,1,2,3].sort((a,b)=>G.total[b]-G.total[a]);
-  st.innerHTML=`<tr><th>#</th><th>Player</th><th>Total Score</th></tr>
-    ${sorted.map((p,r)=>`
-      <tr class="${r===0?'lead':''} ${p===G.myIdx?'me':''}">
-        <td>${r+1}</td><td>${G.names[p]}${p===G.myIdx?' ★':''}</td><td>${G.total[p].toFixed(1)}</td>
-      </tr>`).join('')}`;
-
-  if(G.round>=NROUNDS){
-    const w=sorted[0];
-    nb.textContent=`🏆 ${G.names[w]} जीता! — Home पर जाएं`;
-    nb.onclick=()=>{ ov.classList.add('hide'); goHome(); };
-  } else {
-    nb.textContent=`▶ Round ${G.round+1} शुरू करें`;
-    nb.onclick=nextRound;
-  }
-  ov.classList.remove('hide');
-}
-
-function nextRound(){
-  document.getElementById('scov').classList.add('hide');
-  G.round++; G.leadPlayer=(G.leadPlayer+1)%4; startRound();
-}
-
-function closeScore(){ document.getElementById('scov').classList.add('hide'); }
-
-function viewScore(){
-  showResult(Array(4).fill(0));
-  const nb=document.getElementById('nxtbtn');
-  nb.textContent='✕ बंद करें'; nb.onclick=closeScore;
-}
-
-/* ════════════════════════════════════════
-   AI — Uses same getValid() rules
-════════════════════════════════════════ */
-function aiBid(p){
-  const h=G.hands[p];
-  const tr=h.filter(c=>c.suit===TRUMP);
-  const htr=tr.filter(c=>RV[c.rank]>=10);
-  const nt=h.filter(c=>c.suit!==TRUMP);
-  let b=htr.length
-       +nt.filter(c=>c.rank==='A').length
-       +Math.floor(nt.filter(c=>c.rank==='K').length*.5)
-       +Math.floor((tr.length-htr.length)*.4);
-  return Math.max(1,Math.min(b,8));
-}
-
-function aiPlay(p){
-  const valid=getValid(p);
-  const need=G.tricks[p]<G.bids[p];
-  return G.trick.length===0 ? aiLead(valid,need) : aiFollow(p,valid,need);
-}
-
-function aiLead(valid,need){
-  if(need){
-    const tr=valid.filter(c=>c.suit===TRUMP).sort((a,b)=>RV[b.rank]-RV[a.rank]);
-    if(tr.length&&RV[tr[0].rank]>=10) return tr[0];
-    const ac=valid.filter(c=>c.rank==='A'); if(ac.length) return ac[0];
-    const kg=valid.filter(c=>c.rank==='K'); if(kg.length) return kg[0];
-    if(tr.length) return tr[0];
-  }
-  // Lead lowest non-trump first to preserve trumps
-  const nt=valid.filter(c=>c.suit!==TRUMP).sort((a,b)=>RV[a.rank]-RV[b.rank]);
-  if(nt.length) return nt[0];
-  return valid.sort((a,b)=>RV[a.rank]-RV[b.rank])[0];
-}
-
-function aiFollow(p,valid,need){
-  const ls=G.trick[0].card.suit;
-  // Find current best card in trick
-  const best=G.trick.reduce((b,e)=>beats(e.card,b.card,ls)?e:b,G.trick[0]);
-  if(need){
-    // Try to beat current best
-    const canBeat=valid.filter(c=>beats(c,best.card,ls));
-    if(canBeat.length){
-      // Play lowest winning card to save high cards
-      return canBeat.sort((a,b)=>RV[a.rank]-RV[b.rank])[0];
+function trickWinner(trick, leadSuit) {
+  // trick = [{playerIdx, card}]
+  let best = trick[0];
+  for (let i = 1; i < trick.length; i++) {
+    const c = trick[i].card;
+    const b = best.card;
+    if (c.suit === b.suit) {
+      if (rankVal(c.rank) > rankVal(b.rank)) best = trick[i];
+    } else if (c.suit === TRUMP && b.suit !== TRUMP) {
+      best = trick[i];
     }
   }
-  // Can't win or don't need to — discard lowest non-trump if possible, else lowest card
-  const nt=valid.filter(c=>c.suit!==TRUMP).sort((a,b)=>RV[a.rank]-RV[b.rank]);
-  if(nt.length) return nt[0];
-  return valid.sort((a,b)=>RV[a.rank]-RV[b.rank])[0];
+  return best.playerIdx;
 }
 
-/* ════════════════════════════════════════
-   MULTIPLAYER (PeerJS)
-════════════════════════════════════════ */
-function goMp(){ showScr('mp'); initHost(); }
+// ============================================================
+// GAME STATE
+// ============================================================
+let G = {}; // game state
 
-function initHost(){
-  const code=Math.random().toString(36).substring(2,8).toUpperCase();
-  G.roomCode=code; G.isHost=true;
-  G.mpPlayers=[{peerId:'host',name:G.myName||'Host',seat:0}];
-  const hs=document.getElementById('hstt');
-  hs.textContent='🔄 Connecting...';
-  ['hcbox','hslots','hstrt','hcopy'].forEach(id=>document.getElementById(id).style.display='none');
-  try{
-    G.peer=new Peer(code,{host:'0.peerjs.com',port:443,path:'/',secure:true,debug:0});
-    G.peer.on('open',()=>{
-      hs.textContent='✅ Room तैयार!';
-      document.getElementById('hcnum').textContent=code;
-      document.getElementById('hcbox').style.display='block';
-      document.getElementById('hslots').style.display='grid';
-      document.getElementById('hcopy').style.display='block';
-      updSlots();
-    });
-    G.peer.on('connection',conn=>{
-      conn.on('open',()=>{
-        G.peers[conn.peer]=conn;
-        conn.on('data',d=>handleMp(conn.peer,d));
-        conn.on('close',()=>{ delete G.peers[conn.peer]; updSlots(); });
-      });
-    });
-    G.peer.on('error',e=>{ document.getElementById('hstt').textContent='❌ '+e.type; });
-  }catch(e){ document.getElementById('hstt').textContent='❌ PeerJS unavailable'; }
+function initGame(playerNames, humanIdx = 0, isMultiplayer = false) {
+  G = {
+    players: playerNames.map((name, i) => ({
+      name, i, isHuman: i === humanIdx,
+      hand: [], call: 0, won: 0, totalScore: 0
+    })),
+    humanIdx,
+    isMultiplayer,
+    round: 1,
+    totalRounds: 5,
+    trick: [],
+    trickNum: 1,
+    currentPlayer: 0,
+    leadSuit: null,
+    biddingDone: false,
+    roundHistory: [],
+    gameOver: false,
+    selectedCard: null,
+  };
 }
 
-function updSlots(){
-  const sl=document.getElementById('hslots');
-  const ps=Object.keys(G.peers); const tot=1+ps.length; sl.innerHTML='';
-  const mk=(n,c)=>{ const d=document.createElement('div'); d.className='slot '+c; d.textContent=n; sl.appendChild(d); };
-  mk(G.myName||'Host (आप)','you');
-  ps.forEach(pid=>{ const mp=G.mpPlayers.find(x=>x.peerId===pid); mk(mp?mp.name:'...','in'); });
-  for(let i=tot;i<4;i++) mk('खाली...','');
-  const sb=document.getElementById('hstrt');
-  sb.style.display=tot>=2?'block':'none';
-  sb.textContent=`🎮 ${tot} Players के साथ शुरू करें`;
+// ============================================================
+// AI LOGIC
+// ============================================================
+function aiBid(hand) {
+  let score = 0;
+  const hasAce = s => hand.some(c => c.suit === s && c.rank === 'A');
+  const hasKing = s => hand.some(c => c.suit === s && c.rank === 'K');
+  const spades = hand.filter(c => c.suit === TRUMP);
+
+  // Spades are strongest
+  score += spades.filter(c => ['A','K','Q','J'].includes(c.rank)).length;
+  score += spades.filter(c => ['9','10'].includes(c.rank)).length * 0.5;
+
+  // High cards in other suits
+  for (const suit of SUITS.filter(s => s !== TRUMP)) {
+    if (hasAce(suit)) score += 0.8;
+    if (hasKing(suit)) score += 0.4;
+  }
+
+  return Math.max(1, Math.min(8, Math.round(score)));
 }
 
-function copyCode(){ navigator.clipboard.writeText(G.roomCode).then(()=>showToast('Code Copy हो गया ✓')); }
+function aiChooseCard(hand, trick, leadSuit) {
+  const playable = getPlayableCards(hand, leadSuit);
 
-function joinRoom(){
-  const code=document.getElementById('jcode').value.trim().toUpperCase();
-  const name=document.getElementById('jname').value.trim()||'Friend';
-  if(code.length<4){ showToast('Room Code डालें!'); return; }
-  document.getElementById('jstt').textContent='🔄 Connecting...';
-  G.myName=name; G.isHost=false;
-  const myId='p'+Math.random().toString(36).substring(2,8);
-  G.peer=new Peer(myId,{host:'0.peerjs.com',port:443,path:'/',secure:true,debug:0});
-  G.peer.on('open',()=>{
-    const conn=G.peer.connect(code); G.peers[code]=conn; G.roomCode=code;
-    conn.on('open',()=>{ document.getElementById('jstt').textContent='✅ Connected!'; conn.send({type:'join',name,peerId:myId}); });
-    conn.on('data',d=>handleMp(code,d));
-    conn.on('close',()=>{ document.getElementById('jstt').textContent='❌ Disconnected'; });
+  // If leading
+  if (trick.length === 0) {
+    // Play highest non-trump if possible, else trump
+    const nonTrump = playable.filter(c => c.suit !== TRUMP);
+    if (nonTrump.length > 0) {
+      // Play highest
+      return nonTrump.sort((a,b) => rankVal(b.rank)-rankVal(a.rank))[0];
+    }
+    return playable.sort((a,b) => rankVal(b.rank)-rankVal(a.rank))[0];
+  }
+
+  const currentBest = trick.reduce((best, t) => {
+    if (!best) return t;
+    const b = best.card, c = t.card;
+    if (c.suit === b.suit) return rankVal(c.rank) > rankVal(b.rank) ? t : best;
+    if (c.suit === TRUMP && b.suit !== TRUMP) return t;
+    return best;
+  }, null);
+
+  // Try to win
+  const canWin = playable.filter(c => {
+    const cb = currentBest.card;
+    if (c.suit === cb.suit) return rankVal(c.rank) > rankVal(cb.rank);
+    if (c.suit === TRUMP && cb.suit !== TRUMP) return true;
+    return false;
   });
-  G.peer.on('error',e=>{ document.getElementById('jstt').textContent='❌ '+(e.type==='peer-unavailable'?'Room नहीं मिला':'Error: '+e.type); });
+
+  if (canWin.length > 0) {
+    // Win with lowest winning card
+    const trumpWins = canWin.filter(c => c.suit === TRUMP);
+    const suitWins = canWin.filter(c => c.suit !== TRUMP);
+    if (suitWins.length > 0) return suitWins.sort((a,b) => rankVal(a.rank)-rankVal(b.rank))[0];
+    return trumpWins.sort((a,b) => rankVal(a.rank)-rankVal(b.rank))[0];
+  }
+
+  // Can't win - throw lowest non-trump
+  const losers = playable.filter(c => c.suit !== TRUMP);
+  if (losers.length > 0) return losers.sort((a,b) => rankVal(a.rank)-rankVal(b.rank))[0];
+  return playable.sort((a,b) => rankVal(a.rank)-rankVal(b.rank))[0];
 }
 
-function startMpGame(){
-  if(!G.isHost) return;
-  const pl=Object.keys(G.peers);
-  G.mpPlayers=[{peerId:'host',name:G.myName||'Host',seat:0}];
-  pl.forEach((pid,i)=>{ const mp=G.mpPlayers.find(x=>x.peerId===pid); G.mpPlayers.push({peerId:pid,name:mp?mp.name:`P${i+2}`,seat:i+1}); });
-  initG('multi',G.myName,true);
-  G.mpPlayers.forEach(x=>{ if(x.seat<4) G.names[x.seat]=x.name; });
-  deal();
-  pl.forEach((pid,i)=>{
-    G.peers[pid].send({type:'gs',seat:i+1,names:G.names,hand:G.hands[i+1],total:G.total,round:G.round,lp:G.leadPlayer});
+function getPlayableCards(hand, leadSuit) {
+  if (!leadSuit) return hand;
+  const followSuit = hand.filter(c => c.suit === leadSuit);
+  return followSuit.length > 0 ? followSuit : hand;
+}
+
+// ============================================================
+// GAME FLOW
+// ============================================================
+function startComputerGame() {
+  const names = ['आप', 'Computer 1', 'Computer 2', 'Computer 3'];
+  initGame(names, 0, false);
+  showScreen('gameScreen');
+  startRound();
+}
+
+function startRound() {
+  const hands = dealCards();
+  G.players.forEach((p, i) => {
+    p.hand = hands[i].sort((a,b) => {
+      if (a.suit !== b.suit) return SUITS.indexOf(a.suit) - SUITS.indexOf(b.suit);
+      return rankVal(b.rank) - rankVal(a.rank);
+    });
+    p.call = 0; p.won = 0;
   });
-  showScr('game'); startRound();
+  G.trick = [];
+  G.trickNum = 1;
+  G.currentPlayer = 0;
+  G.leadSuit = null;
+  G.biddingDone = false;
+  G.selectedCard = null;
+  renderScoreBar();
+  updateRoundBadge();
+  startBidding();
 }
 
-function handleMp(from,d){
-  if(d.type==='join'){
-    if(!G.mpPlayers.find(x=>x.peerId===from)) G.mpPlayers.push({peerId:from,name:d.name,seat:G.mpPlayers.length});
-    updSlots(); if(G.peers[from]) G.peers[from].send({type:'joined'}); return;
+// ============================================================
+// BIDDING
+// ============================================================
+function startBidding() {
+  doBidForPlayer(0);
+}
+
+function doBidForPlayer(idx) {
+  if (idx >= G.players.length) {
+    G.biddingDone = true;
+    G.currentPlayer = 0;
+    renderGame();
+    if (!G.players[0].isHuman) setTimeout(doAiTurn, 800);
+    return;
   }
-  if(d.type==='joined'){ document.getElementById('jstt').textContent='✅ Joined! Host के start का wait करें...'; return; }
-  if(d.type==='gs'){
-    initG('multi',G.myName,false);
-    G.myIdx=d.seat; G.names=d.names; G.hands[d.seat]=d.hand;
-    G.total=d.total; G.round=d.round; G.leadPlayer=d.lp;
-    showScr('game'); startRound(); return;
+  const player = G.players[idx];
+  if (!player.isHuman) {
+    player.call = aiBid(player.hand);
+    setTimeout(() => doBidForPlayer(idx + 1), 300);
+  } else {
+    showBidPanel(player, () => doBidForPlayer(idx + 1));
   }
-  if(d.type==='bid'){ G.bids[d.p]=d.b; G.bidsDone++; renderAll(); processBid(); return; }
-  if(d.type==='play'){ playCard(d.p,d.c); return; }
 }
 
-/* ════════════════════════════════════════
-   NAVIGATION
-════════════════════════════════════════ */
-function showScr(id){
-  document.querySelectorAll('.scr').forEach(s=>{ s.classList.remove('on'); s.style.display='none'; });
-  const s=document.getElementById(id);
-  s.style.display=id==='game'?'grid':'flex'; s.classList.add('on');
+function showBidPanel(player, onDone) {
+  const overlay = document.createElement('div');
+  overlay.className = 'bid-overlay';
+  overlay.id = 'bidOverlay';
+
+  // Preview cards
+  const cardHTML = player.hand.slice(0,8).map(c =>
+    `<div style="background:white;border-radius:5px;padding:2px 4px;font-size:0.7rem;font-weight:800;color:${suitColor(c.suit) === 'red' ? '#c1121f' : '#1a1a1a'}">${c.rank}${c.suit}</div>`
+  ).join('') + (player.hand.length > 8 ? '<div style="opacity:0.5;font-size:0.7rem">...</div>' : '');
+
+  let selected = null;
+
+  overlay.innerHTML = `
+    <div class="bid-panel">
+      <div class="bid-title">अपनी Call करें</div>
+      <div class="bid-subtitle">आपके पास ${player.hand.filter(c=>c.suit===TRUMP).length} Spades हैं</div>
+      <div class="bid-cards-preview">${cardHTML}</div>
+      <div class="bid-number-grid" id="bidGrid">
+        ${[1,2,3,4,5,6,7,8].map(n=>`<button class="bid-num-btn" onclick="selectBid(this,${n})">${n}</button>`).join('')}
+      </div>
+      <button class="btn btn-primary bid-confirm" id="bidConfirmBtn" disabled onclick="confirmBid()">Call करें</button>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  window._bidOnDone = (call) => {
+    player.call = call;
+    overlay.remove();
+    onDone();
+  };
 }
 
-function goHome(){
-  if(G.peer){ try{G.peer.destroy();}catch(e){} G.peer=null; }
-  G.peers={};
-  document.getElementById('bsw').classList.add('hide');
-  showScr('home');
+function selectBid(btn, n) {
+  document.querySelectorAll('.bid-num-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  window._selectedBid = n;
+  document.getElementById('bidConfirmBtn').disabled = false;
 }
 
-function goRules(){ document.getElementById('rulov').classList.remove('hide'); }
-function closeRules(){ document.getElementById('rulov').classList.add('hide'); }
-
-/* ════════════════════════════════════════
-   TOAST
-════════════════════════════════════════ */
-let _tt;
-function showToast(msg,ms=2000){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('on');
-  clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('on'),ms);
-}
-
-/* ════════════════════════════════════════
-   PWA — Single File, Self-Contained
-════════════════════════════════════════ */
-function genIcon(sz){
-  const cv=document.createElement('canvas'); cv.width=cv.height=sz;
-  const c=cv.getContext('2d');
-  // Background
-  c.fillStyle='#0d2818'; c.fillRect(0,0,sz,sz);
-  // Gold circle
-  c.beginPath(); c.arc(sz/2,sz/2,sz*.42,0,Math.PI*2);
-  c.fillStyle='rgba(245,195,32,.15)'; c.fill();
-  c.strokeStyle='rgba(245,195,32,.4)'; c.lineWidth=sz*.04; c.stroke();
-  // Spade symbol
-  c.fillStyle='#f5c320';
-  c.font=`bold ${Math.floor(sz*.55)}px serif`;
-  c.textAlign='center'; c.textBaseline='middle';
-  c.fillText('♠',sz/2,sz/2);
-  return cv.toDataURL('image/png');
-}
-
-(function setupPWA(){
-  try{
-    const i192=genIcon(192), i512=genIcon(512);
-    const mf={
-      name:'Call Break',short_name:'Call Break',
-      description:'Call Break Card Game — Official Rules',
-      start_url:'./',display:'standalone',
-      background_color:'#0d2818',theme_color:'#0d2818',
-      icons:[{src:i192,sizes:'192x192',type:'image/png'},{src:i512,sizes:'512x512',type:'image/png'}]
-    };
-    const blob=new Blob([JSON.stringify(mf)],{type:'application/manifest+json'});
-    const url=URL.createObjectURL(blob);
-    const link=document.createElement('link'); link.rel='manifest'; link.href=url;
-    document.head.appendChild(link);
-  }catch(e){}
-
-  // Service worker via blob (provides basic offline for single-file deploy)
-  if('serviceWorker' in navigator){
-    try{
-      const sw=`
-        const CV='cb-v3';
-        self.addEventListener('install',()=>self.skipWaiting());
-        self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});
-        self.addEventListener('fetch',e=>{
-          e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{
-            if(res&&res.status===200){
-              const cl=res.clone();
-              caches.open(CV).then(c=>c.put(e.request,cl));
-            }return res;
-          }).catch(()=>caches.match(e.request))));
-        });
-      `;
-      const sb=new Blob([sw],{type:'text/javascript'});
-      navigator.serviceWorker.register(URL.createObjectURL(sb)).catch(()=>{});
-    }catch(e){}
+function confirmBid() {
+  if (window._selectedBid && window._bidOnDone) {
+    window._bidOnDone(window._selectedBid);
   }
-})();
+}
 
-let _dp;
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault(); _dp=e;
-  setTimeout(()=>document.getElementById('ib').classList.add('on'),4000);
+// ============================================================
+// GAME RENDER
+// ============================================================
+function renderGame() {
+  renderScoreBar();
+  renderOpponents();
+  renderPlayerHand();
+  renderPlayedCards();
+  updateRoundBadge();
+}
+
+function renderScoreBar() {
+  const bar = document.getElementById('scoreBar');
+  bar.innerHTML = G.players.map((p, i) => `
+    <div class="score-player ${i === G.currentPlayer ? 'active-turn' : ''}">
+      <div class="sname">${p.name.substring(0,8)}</div>
+      <div class="scall">📣${p.call || '?'}</div>
+      <div class="swon">✓${p.won}</div>
+      <div class="stotal">${p.totalScore.toFixed(1)}pts</div>
+    </div>
+  `).join('');
+}
+
+function renderOpponents() {
+  // Positions: left=1, top=2, right=3 (relative to human=0)
+  const positions = [
+    { nameEl: 'nameLeft', cardsEl: 'cardsLeft', idx: 1 },
+    { nameEl: 'nameTop', cardsEl: 'cardsTop', idx: 2 },
+    { nameEl: 'nameRight', cardsEl: 'cardsRight', idx: 3 },
+  ];
+  for (const pos of positions) {
+    const p = G.players[pos.idx];
+    document.getElementById(pos.nameEl).textContent = p.name.substring(0,8) + ` (${p.call})`;
+    const el = document.getElementById(pos.cardsEl);
+    el.innerHTML = '';
+    const count = p.hand.length;
+    for (let i = 0; i < count; i++) {
+      const mc = document.createElement('div');
+      mc.className = 'mini-card';
+      el.appendChild(mc);
+    }
+  }
+}
+
+function renderPlayerHand() {
+  const container = document.getElementById('handContainer');
+  container.innerHTML = '';
+  const hand = G.players[G.humanIdx].hand;
+  const n = hand.length;
+  const W = Math.min(window.innerWidth - 20, 400);
+  const cardW = 52;
+  const overlap = n > 1 ? Math.min(cardW - 4, (W - cardW) / (n - 1)) : 0;
+  const totalW = cardW + overlap * (n - 1);
+  const startX = (W - totalW) / 2;
+
+  const playable = G.biddingDone && G.currentPlayer === G.humanIdx
+    ? getPlayableCards(hand, G.leadSuit) : [];
+
+  hand.forEach((card, i) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'hand-card';
+    wrapper.style.left = (startX + i * overlap) + 'px';
+    wrapper.style.zIndex = i + 1;
+
+    const isPlayable = playable.includes(card);
+    const isSelected = G.selectedCard === card;
+
+    wrapper.innerHTML = makeCardHTML(card, true);
+    const cardEl = wrapper.querySelector('.card');
+    if (isSelected) cardEl.classList.add('selected');
+    if (isPlayable) cardEl.classList.add('highlight');
+
+    if (isPlayable) {
+      wrapper.onclick = () => selectCard(card);
+    }
+
+    container.appendChild(wrapper);
+  });
+}
+
+function makeCardHTML(card, full = true) {
+  const col = suitColor(card.suit) === 'red' ? 'red' : 'black';
+  const sizeClass = full ? '' : 'played-face-card';
+  return `<div class="card ${sizeClass}" style="color:var(--${col === 'red' ? 'heart' : 'spade'})">
+    <div><div class="card-rank">${card.rank}</div><div class="card-suit">${card.suit}</div></div>
+    <div class="card-center">${card.suit}</div>
+    <div class="card-corner-bl"><div class="card-rank">${card.rank}</div><div class="card-suit">${card.suit}</div></div>
+  </div>`;
+}
+
+function renderPlayedCards() {
+  const positions = ['bottom', 'left', 'top', 'right']; // relative to human (idx 0)
+  const playerPositions = { 0: 'bottom', 1: 'left', 2: 'top', 3: 'right' };
+
+  ['slotTop','slotLeft','slotRight','slotBottom'].forEach(id => document.getElementById(id).innerHTML = '');
+
+  G.trick.forEach(t => {
+    const pos = playerPositions[t.playerIdx];
+    const slot = document.getElementById('slot' + pos.charAt(0).toUpperCase() + pos.slice(1));
+    if (slot) slot.innerHTML = makeCardHTML(t.card, false);
+  });
+
+  document.getElementById('roundInfo').innerHTML = `Trick<br>${G.trickNum}/13`;
+}
+
+function updateRoundBadge() {
+  document.getElementById('roundBadge').textContent = `Round ${G.round}/${G.totalRounds}`;
+}
+
+// ============================================================
+// CARD PLAY LOGIC
+// ============================================================
+function selectCard(card) {
+  if (G.currentPlayer !== G.humanIdx) return;
+  if (G.selectedCard === card) {
+    // Play it
+    playCard(G.humanIdx, card);
+  } else {
+    G.selectedCard = card;
+    renderPlayerHand();
+    // Show tap again to play
+    showToast('फिर से tap करें - खेलें');
+  }
+}
+
+function playCard(playerIdx, card) {
+  const player = G.players[playerIdx];
+  const idx = player.hand.indexOf(card);
+  if (idx < 0) return;
+  player.hand.splice(idx, 1);
+
+  if (G.trick.length === 0) {
+    G.leadSuit = card.suit;
+  }
+
+  G.trick.push({ playerIdx, card });
+  G.selectedCard = null;
+  renderGame();
+
+  if (G.trick.length === 4) {
+    setTimeout(resolveTrick, 800);
+  } else {
+    G.currentPlayer = (playerIdx + 1) % 4;
+    renderScoreBar();
+    if (!G.players[G.currentPlayer].isHuman) {
+      setTimeout(doAiTurn, 700);
+    }
+  }
+}
+
+function doAiTurn() {
+  if (G.currentPlayer === G.humanIdx) return;
+  const player = G.players[G.currentPlayer];
+  const card = aiChooseCard(player.hand, G.trick, G.leadSuit);
+  playCard(G.currentPlayer, card);
+}
+
+function resolveTrick() {
+  const winner = trickWinner(G.trick, G.leadSuit);
+  G.players[winner].won++;
+
+  const winnerName = G.players[winner].name;
+  showTrickFlash(`${winnerName} ने जीता! 🎉`);
+
+  G.trick = [];
+  G.leadSuit = null;
+  G.trickNum++;
+  G.currentPlayer = winner;
+
+  renderGame();
+
+  if (G.trickNum > 13) {
+    setTimeout(endRound, 1200);
+  } else {
+    if (!G.players[winner].isHuman) {
+      setTimeout(doAiTurn, 1000);
+    }
+  }
+}
+
+// ============================================================
+// ROUND END / SCORING
+// ============================================================
+function endRound() {
+  const roundData = G.players.map(p => {
+    const won = p.won;
+    const call = p.call;
+    let delta;
+    if (won >= call) {
+      delta = call + (won - call) * 0.1;
+    } else {
+      delta = -call;
+    }
+    p.totalScore += delta;
+    return { name: p.name, call, won, delta };
+  });
+  G.roundHistory.push(roundData);
+  showRoundEnd(roundData);
+}
+
+function showRoundEnd(data) {
+  const overlay = document.createElement('div');
+  overlay.className = 'round-end-overlay';
+  const isLast = G.round >= G.totalRounds;
+
+  overlay.innerHTML = `
+    <div class="round-end-panel">
+      <div class="round-end-title">Round ${G.round} खत्म!</div>
+      <table class="score-table">
+        <thead><tr><th>Player</th><th>Call</th><th>Won</th><th>+/-</th><th>Total</th></tr></thead>
+        <tbody>
+          ${data.map((d, i) => `
+            <tr class="${d.delta >= 0 ? 'won-row' : 'lost-row'}">
+              <td>${d.name.substring(0,8)}</td>
+              <td>${d.call}</td>
+              <td>${d.won}</td>
+              <td>${d.delta >= 0 ? '+' : ''}${d.delta.toFixed(1)}</td>
+              <td>${G.players[i].totalScore.toFixed(1)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+      <div class="round-actions">
+        ${isLast
+          ? `<button class="btn btn-primary" onclick="showGameEnd()">🏆 Final Results</button>`
+          : `<button class="btn btn-primary" onclick="nextRound()">▶ अगला Round</button>`}
+        <button class="btn btn-secondary" onclick="confirmQuit()">🏠 Home</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function nextRound() {
+  document.querySelector('.round-end-overlay')?.remove();
+  G.round++;
+  startRound();
+}
+
+function showGameEnd() {
+  document.querySelector('.round-end-overlay')?.remove();
+  const sorted = [...G.players].sort((a,b) => b.totalScore - a.totalScore);
+  const winner = sorted[0];
+
+  const overlay = document.createElement('div');
+  overlay.className = 'game-end-overlay';
+  overlay.innerHTML = `
+    <div class="winner-banner">🏆</div>
+    <div class="winner-name">${winner.name} जीत गए!</div>
+    <div class="final-scores">
+      <table class="score-table">
+        <thead><tr><th>Rank</th><th>Player</th><th>Score</th></tr></thead>
+        <tbody>
+          ${sorted.map((p,i) => `
+            <tr>
+              <td>${['🥇','🥈','🥉','4️⃣'][i]}</td>
+              <td>${p.name}</td>
+              <td style="color:var(--gold);font-weight:800">${p.totalScore.toFixed(1)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <button class="btn btn-primary" style="width:90%;max-width:300px" onclick="playAgain()">🔄 फिर खेलें</button>
+    <button class="btn btn-secondary" style="width:90%;max-width:300px" onclick="goHome()">🏠 Home</button>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function playAgain() {
+  document.querySelector('.game-end-overlay')?.remove();
+  startComputerGame();
+}
+
+function goHome() {
+  document.querySelector('.game-end-overlay')?.remove();
+  document.querySelector('.round-end-overlay')?.remove();
+  showScreen('homeScreen');
+}
+
+// ============================================================
+// MULTIPLAYER (Firebase Realtime via localStorage simulation + BroadcastChannel)
+// ============================================================
+// Note: For real multiplayer, Firebase Realtime DB is used
+// This implementation uses BroadcastChannel API for same-device testing
+// and localStorage + polling for cross-tab (same browser) play.
+// For real deployment, replace with Firebase.
+
+let multiRoom = null;
+let myPlayerId = null;
+let myPlayerName = null;
+let bc = null; // BroadcastChannel
+
+function showLobby() { showScreen('lobbyScreen'); }
+
+function generateCode() {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+function createRoom() {
+  const name = document.getElementById('hostName').value.trim();
+  if (!name) { showToast('नाम डालें!'); return; }
+  const code = generateCode();
+  myPlayerId = 'p0';
+  myPlayerName = name;
+  multiRoom = {
+    code,
+    players: [{ id: 'p0', name }],
+    host: 'p0',
+    started: false
+  };
+  saveRoom();
+  setupBroadcast(code);
+  showRoomScreen(code, true);
+}
+
+function joinRoom() {
+  const name = document.getElementById('joinName').value.trim();
+  const code = document.getElementById('joinCode').value.trim().toUpperCase();
+  if (!name || !code) { showToast('नाम और Code डालें!'); return; }
+
+  const room = loadRoom(code);
+  if (!room) { showToast('Room नहीं मिला!'); return; }
+  if (room.players.length >= 4) { showToast('Room भरा हुआ है!'); return; }
+  if (room.started) { showToast('Game शुरू हो चुकी है!'); return; }
+
+  myPlayerId = 'p' + room.players.length;
+  myPlayerName = name;
+  room.players.push({ id: myPlayerId, name });
+  multiRoom = room;
+  saveRoom();
+  setupBroadcast(code);
+  broadcastUpdate();
+  showRoomScreen(code, false);
+}
+
+function saveRoom() {
+  localStorage.setItem('cbroom_' + multiRoom.code, JSON.stringify(multiRoom));
+}
+
+function loadRoom(code) {
+  const s = localStorage.getItem('cbroom_' + code);
+  return s ? JSON.parse(s) : null;
+}
+
+function setupBroadcast(code) {
+  if (bc) { bc.close(); }
+  try {
+    bc = new BroadcastChannel('callbreak_' + code);
+    bc.onmessage = (e) => handleBroadcast(e.data);
+  } catch(err) {
+    // BroadcastChannel not supported, use polling
+    startPolling(code);
+  }
+}
+
+function broadcastUpdate() {
+  saveRoom();
+  if (bc) bc.postMessage({ type: 'room_update', room: multiRoom });
+}
+
+let pollInterval = null;
+function startPolling(code) {
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(() => {
+    const r = loadRoom(code);
+    if (r) handleBroadcast({ type: 'room_update', room: r });
+  }, 1000);
+}
+
+function handleBroadcast(data) {
+  if (data.type === 'room_update') {
+    multiRoom = data.room;
+    if (document.getElementById('roomScreen').classList.contains('active')) {
+      updateRoomUI();
+    }
+    if (multiRoom.started && !document.getElementById('gameScreen').classList.contains('active')) {
+      startMultiplayerGame();
+    }
+  } else if (data.type === 'card_played') {
+    if (!G.isMultiplayer) return;
+    if (data.playerIdx !== G.humanIdx) {
+      const player = G.players[data.playerIdx];
+      const card = player.hand.find(c => c.suit === data.suit && c.rank === data.rank);
+      if (card) playCard(data.playerIdx, card);
+    }
+  } else if (data.type === 'bid_set') {
+    if (!G.isMultiplayer) return;
+    G.players[data.playerIdx].call = data.call;
+  }
+}
+
+function showRoomScreen(code, isHost) {
+  showScreen('roomScreen');
+  document.getElementById('roomCodeDisplay').textContent = code;
+  updateRoomUI();
+}
+
+function updateRoomUI() {
+  if (!multiRoom) return;
+  const players = multiRoom.players;
+  document.getElementById('playerCount').textContent = players.length;
+
+  const list = document.getElementById('playerList');
+  list.innerHTML = '';
+  const allSlots = 4;
+  for (let i = 0; i < allSlots; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'player-slot' + (players[i] ? ' filled' : '');
+    slot.innerHTML = `<div class="dot"></div><div class="pname">${players[i] ? players[i].name : 'Waiting...'}</div>`;
+    list.appendChild(slot);
+  }
+
+  const isHost = multiRoom.host === myPlayerId;
+  const isFull = players.length === 4;
+
+  document.getElementById('startGameBtn').style.display = (isHost && isFull) ? 'block' : 'none';
+  document.getElementById('waitingText').style.display = isFull ? 'none' : 'block';
+  document.getElementById('waitingText').textContent = `${4 - players.length} और players का इंतज़ार है...`;
+}
+
+function copyRoomLink() {
+  const code = multiRoom?.code;
+  const url = `${location.href.split('?')[0]}?room=${code}`;
+  navigator.clipboard.writeText(url).then(() => showToast('Link copy हो गया! 📋'));
+}
+
+function leaveRoom() {
+  if (pollInterval) clearInterval(pollInterval);
+  if (bc) bc.close();
+  multiRoom = null;
+  showScreen('homeScreen');
+}
+
+function startMultiplayerGame() {
+  if (!multiRoom) return;
+  multiRoom.started = true;
+  saveRoom();
+  if (bc) bc.postMessage({ type: 'room_update', room: multiRoom });
+
+  const myIdx = multiRoom.players.findIndex(p => p.id === myPlayerId);
+  const names = multiRoom.players.map(p => p.name);
+  initGame(names, myIdx, true);
+  showScreen('gameScreen');
+  startRound();
+}
+
+// Override playCard for multiplayer broadcast
+const _origPlayCard = playCard;
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showRules() { showScreen('rulesScreen'); }
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+
+function showTrickFlash(msg) {
+  const f = document.createElement('div');
+  f.className = 'trick-flash';
+  f.textContent = msg;
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 1300);
+}
+
+function confirmQuit() {
+  if (confirm('Game छोड़ना चाहते हैं?')) {
+    document.querySelector('.round-end-overlay')?.remove();
+    document.querySelector('.game-end-overlay')?.remove();
+    document.getElementById('bidOverlay')?.remove();
+    showScreen('homeScreen');
+  }
+}
+
+// ============================================================
+// URL-based room joining
+// ============================================================
+window.addEventListener('load', () => {
+  const params = new URLSearchParams(location.search);
+  const roomCode = params.get('room');
+  if (roomCode) {
+    showScreen('lobbyScreen');
+    document.getElementById('joinCode').value = roomCode;
+    showToast(`Room Code: ${roomCode} - अपना नाम डालें और Join करें!`);
+  }
 });
-function instApp(){ if(!_dp)return; _dp.prompt(); _dp.userChoice.then(()=>{ _dp=null; dimissInst(); }); }
-function dimissInst(){ document.getElementById('ib').classList.remove('on'); }
 
-/* ════════════════════════════════════════
-   BOOT
-════════════════════════════════════════ */
-initG('solo',null,true);
-showScr('home');
+// ============================================================
+// PWA Service Worker (inline)
+// ============================================================
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'callbreak-v1';
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+// Install prompt
+let installPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  installPrompt = e;
+  setTimeout(() => {
+    if (installPrompt) showToast('💡 Browser menu से Install करें - App में चलाएं!');
+  }, 3000);
+});
 </script>
 </body>
 </html>
