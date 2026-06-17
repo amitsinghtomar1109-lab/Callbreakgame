@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Call Break • कॉल ब्रेक</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f2d1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Call Break">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+/* ═══════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════ */
+:root {
+  --felt:       #0e2a18;
+  --felt-mid:   #143520;
+  --felt-light: #1a4228;
+  --gold:       #f5c842;
+  --gold-dim:   #c9a030;
+  --gold-glow:  rgba(245,200,66,.25);
+  --red:        #e01b2f;
+  --black:      #1a1a1a;
+  --white:      #ffffff;
+  --card-shadow: 0 4px 16px rgba(0,0,0,.55);
+  --radius-card: 8px;
+  --trump-glow:  0 0 0 2px #4a6fff, 0 4px 16px rgba(74,111,255,.4);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%; height: 100dvh;
+  overflow: hidden;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--felt);
+  color: #fff;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ═══════════════════════════════════════
+   SCREENS
+═══════════════════════════════════════ */
+.screen { display: none; width: 100%; height: 100%; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ═══════════════════════════════════════
+   HOME SCREEN
+═══════════════════════════════════════ */
+#home-screen {
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, #1e5c30 0%, #081a0e 100%);
+  padding: 32px 24px;
+}
+.logo-wrap {
+  text-align: center;
+  margin-bottom: 8px;
+}
+.logo-suits {
+  font-size: 2.4rem;
+  letter-spacing: 10px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.6));
+}
+.suit-s { color: #eee; }
+.suit-h { color: #f44; }
+.suit-d { color: #f44; }
+.suit-c { color: #eee; }
+.logo-title {
+  font-size: 3.2rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: var(--gold);
+  text-shadow: 0 0 30px rgba(245,200,66,.5), 0 3px 0 rgba(0,0,0,.5);
+  margin: 4px 0 2px;
+  line-height: 1;
+}
+.logo-sub {
+  font-size: .95rem;
+  color: rgba(255,255,255,.45);
+  letter-spacing: 3px;
+}
+.menu-btn {
+  width: 100%;
+  max-width: 280px;
+  padding: 15px 24px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: transform .1s, filter .1s;
+  letter-spacing: .5px;
+}
+.menu-btn:active { transform: scale(.96); }
+.menu-btn.primary {
+  background: linear-gradient(135deg, #f5c842 0%, #e8a010 100%);
+  color: #1a1a1a;
+  box-shadow: 0 4px 20px rgba(245,200,66,.4), 0 2px 0 #a06000;
+}
+.menu-btn.secondary {
+  background: rgba(255,255,255,.1);
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,.25);
+  box-shadow: 0 2px 10px rgba(0,0,0,.3);
+}
+.menu-btn.secondary:active { filter: brightness(1.1); }
+.home-version {
+  font-size: .7rem;
+  color: rgba(255,255,255,.25);
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+
+/* ═══════════════════════════════════════
+   MULTIPLAYER SCREEN
+═══════════════════════════════════════ */
+#mp-screen {
+  position: relative;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  background: radial-gradient(ellipse 80% 60% at 50% 30%, #1e5c30 0%, #081a0e 100%);
+  padding: 60px 20px 24px;
+  overflow-y: auto;
+}
+.mp-back {
+  position: absolute;
+  top: 14px; left: 14px;
+  background: rgba(0,0,0,.4);
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,.2);
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.mp-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.mp-panel {
+  width: 100%;
+  max-width: 380px;
+  background: rgba(0,0,0,.35);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 18px;
+  padding: 18px;
+}
+.mp-panel h3 {
+  font-size: .9rem;
+  opacity: .7;
+  margin-bottom: 10px;
+  letter-spacing: .5px;
+}
+.room-code-box {
+  background: rgba(0,0,0,.5);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  margin: 8px 0;
+  border: 1px solid rgba(245,200,66,.3);
+}
+.room-code-text {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(245,200,66,.4);
+}
+.mp-status { font-size: .85rem; min-height: 22px; opacity: .8; text-align: center; }
+.player-slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 10px 0;
+}
+.slot {
+  padding: 9px 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  text-align: center;
+  font-size: .78rem;
+  color: rgba(255,255,255,.4);
+}
+.slot.you  { border-color: #4caf50; color: #4caf50; background: rgba(76,175,80,.1); }
+.slot.filled { border-color: var(--gold); color: var(--gold); background: rgba(245,200,66,.1); }
+.mp-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1.3rem;
+  letter-spacing: 5px;
+  text-align: center;
+  text-transform: uppercase;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,.2);
+  background: rgba(0,0,0,.45);
+  color: #fff;
+  outline: none;
+  margin: 6px 0;
+}
+.mp-input.name-input { font-size: 1rem; letter-spacing: 1px; }
+.mp-input:focus { border-color: var(--gold); }
+.mp-input::placeholder { opacity: .35; letter-spacing: 1px; }
+.mp-btn {
+  width: 100%;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  font-size: .95rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: filter .15s, transform .1s;
+}
+.mp-btn:active { transform: scale(.97); }
+.mp-btn.gold { background: linear-gradient(135deg,#f5c842,#e8a010); color: #1a1a1a; }
+.mp-btn.outline { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.25); }
+.mp-divider { opacity: .35; font-size: .8rem; text-align: center; }
+
+/* ═══════════════════════════════════════
+   GAME SCREEN LAYOUT
+═══════════════════════════════════════ */
+#game-screen {
+  height: 100%; height: 100dvh;
+  display: grid;
+  grid-template-rows: 44px 1fr;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 40%, var(--felt-light) 0%, var(--felt) 100%);
+  overflow: hidden;
+}
+
+/* ─ TOP BAR ─ */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: rgba(0,0,0,.5);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  flex-shrink: 0;
+}
+.tb-round {
+  font-size: .8rem;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+.tb-scores {
+  display: flex;
+  gap: 10px;
+  font-size: .72rem;
+}
+.tb-scores .s { opacity: .65; }
+.tb-scores .s.me { color: var(--gold); font-weight: 700; opacity: 1; }
+.tb-icon {
+  font-size: .8rem;
+  cursor: pointer;
+  opacity: .5;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: opacity .15s;
+}
+.tb-icon:hover { opacity: 1; }
+
+/* ─ PLAY AREA GRID ─ */
+.play-area {
+  display: grid;
+  grid-template-areas:
+    ".     top    ."
+    "left  mid    right"
+    ".     mine   .";
+  grid-template-rows: 1fr auto 1fr;
+  grid-template-columns: auto 1fr auto;
+  gap: 2px;
+  padding: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─ OPPONENT ZONES ─ */
+.ozone {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+.ozone.top   { grid-area: top;   flex-direction: column; justify-content: flex-end; }
+.ozone.left  { grid-area: left;  flex-direction: column; justify-content: center; }
+.ozone.right { grid-area: right; flex-direction: column; justify-content: center; }
+
+.ozone .pinfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.ozone.left  .pinfo { flex-direction: row-reverse; gap: 6px; }
+.ozone.right .pinfo { flex-direction: row; gap: 6px; }
+
+.plabel {
+  font-size: .68rem;
+  font-weight: 700;
+  white-space: nowrap;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: rgba(0,0,0,.5);
+  border: 1px solid rgba(255,255,255,.1);
+  transition: background .2s, border-color .2s;
+}
+.plabel .pb { color: rgba(255,255,255,.55); font-size: .6rem; }
+.plabel.active {
+  background: rgba(245,200,66,.9);
+  color: #1a1a1a;
+  border-color: var(--gold);
+  animation: glowpulse 1.2s ease-in-out infinite;
+}
+@keyframes glowpulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(245,200,66,.4); }
+  50%      { box-shadow: 0 0 0 6px rgba(245,200,66,0); }
+}
+
+/* Opponent card backs */
+.opp-backs {
+  display: flex;
+  position: relative;
+}
+.ozone.top   .opp-backs { flex-direction: row; }
+.ozone.left  .opp-backs,
+.ozone.right .opp-backs { flex-direction: column; }
+
+.cback {
+  width: 26px; height: 38px;
+  border-radius: 5px;
+  background: linear-gradient(145deg, #163a7a 0%, #1e55b0 45%, #0f2d5e 100%);
+  border: 1px solid rgba(255,255,255,.25);
+  box-shadow: 1px 1px 4px rgba(0,0,0,.5);
+  flex-shrink: 0;
+}
+.ozone.top   .cback + .cback { margin-left: -18px; }
+.ozone.left  .cback + .cback,
+.ozone.right .cback + .cback { margin-top: -30px; }
+
+/* ─ CENTER TABLE ─ */
+.center-zone {
+  grid-area: mid;
+  position: relative;
+  display: grid;
+  grid-template-areas:
+    ". t ."
+    "l . r"
+    ". b .";
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  min-width: 160px;
+  min-height: 130px;
+}
+/* Felt circle decoration */
+.center-zone::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.06);
+  pointer-events: none;
+}
+.cslot { display: flex; align-items: center; justify-content: center; }
+.cslot.t { grid-area: t; }
+.cslot.l { grid-area: l; }
+.cslot.r { grid-area: r; }
+.cslot.b { grid-area: b; }
+
+.trick-banner {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 2px 10px rgba(0,0,0,.8);
+  opacity: 0;
+  transition: opacity .25s;
+  pointer-events: none;
+  text-align: center;
+  padding: 4px;
+}
+.trick-banner.show { opacity: 1; }
+
+/* ─ MY AREA ─ */
+.my-area {
+  grid-area: mine;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 4px 6px;
+}
+.my-label {
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: rgba(0,0,0,.5);
+  border: 1px solid rgba(255,255,255,.1);
+  display: flex; align-items: center; gap: 6px;
+}
+.my-label.active {
+  background: rgba(245,200,66,.9);
+  color: #1a1a1a;
+  border-color: var(--gold);
+  animation: glowpulse 1.2s ease-in-out infinite;
+}
+.my-hand {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  min-height: 72px;
+}
+.my-hand .card { margin: 0 -12px; }
+.my-hand .card:first-child { margin-left: 0; }
+.my-hand .card:last-child  { margin-right: 0; }
+
+/* ═══════════════════════════════════════
+   PLAYING CARDS
+═══════════════════════════════════════ */
+.card {
+  width: 46px;
+  height: 66px;
+  border-radius: var(--radius-card);
+  background: #fff;
+  border: 1.5px solid #ddd;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 4px;
+  font-size: .72rem;
+  font-weight: 800;
+  position: relative;
+  flex-shrink: 0;
+  cursor: default;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;
+}
+.card .cr { line-height: 1; }
+.card .cs { font-size: 1.15rem; }
+.card .crb { transform: rotate(180deg); line-height: 1; }
+.card.red   { color: var(--red); }
+.card.black { color: #111; }
+.card.trump { box-shadow: var(--trump-glow); border-color: #6688ff; }
+
+/* Played card (center) */
+.card.played {
+  width: 40px; height: 57px;
+  font-size: .65rem;
+  box-shadow: 0 3px 12px rgba(0,0,0,.5);
+}
+.card.played .cs { font-size: .95rem; }
+
+/* Selectable (my turn) */
+.card.sel {
+  cursor: pointer;
+}
+.card.sel:hover {
+  transform: translateY(-14px) scale(1.05);
+  box-shadow: 0 10px 28px rgba(0,0,0,.6), 0 0 0 2px var(--gold);
+  z-index: 20;
+}
+.card.sel:active { transform: translateY(-8px) scale(1.02); }
+
+/* Disabled */
+.card.dim {
+  opacity: .38;
+  cursor: not-allowed;
+  filter: grayscale(.3);
+}
+
+/* Card entry animation */
+@keyframes cardIn {
+  from { transform: translateY(30px) scale(.85); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+.card.played { animation: cardIn .25s cubic-bezier(.34,1.3,.64,1); }
+
+/* ═══════════════════════════════════════
+   TRICK CHIP
+═══════════════════════════════════════ */
+.tchip {
+  display: inline-block;
+  background: rgba(0,0,0,.5);
+  border-radius: 20px;
+  padding: 1px 7px;
+  font-size: .6rem;
+  color: rgba(255,255,255,.8);
+  margin-left: 3px;
+}
+.tchip.met { color: #6dff9a; }
+.tchip.fail { color: #ff7070; }
+
+/* ═══════════════════════════════════════
+   BOTTOM SHEET (BIDDING)
+═══════════════════════════════════════ */
+.sheet-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 80;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet-overlay.hidden { display: none; }
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(180deg, #1a4228 0%, #0d2a18 100%);
+  border-radius: 22px 22px 0 0;
+  padding: 16px 18px 28px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 -10px 40px rgba(0,0,0,.6);
+  animation: slideUp .28s cubic-bezier(.34,1.3,.64,1);
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: rgba(255,255,255,.2);
+  border-radius: 2px;
+  margin: 0 auto 14px;
+}
+.sheet-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 4px;
+}
+.sheet-hint {
+  font-size: .78rem;
+  opacity: .6;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.bid-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.bid-btn {
+  padding: 13px 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  border: 1.5px solid rgba(255,255,255,.15);
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  transition: background .15s, border-color .15s, transform .1s;
+}
+.bid-btn:hover   { background: rgba(245,200,66,.25); border-color: var(--gold); }
+.bid-btn:active  { transform: scale(.93); }
+.bid-btn.picked  { background: linear-gradient(135deg,#f5c842,#e8a010); color: #1a1a1a; border-color: var(--gold-dim); }
+.bid-confirm {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #f5c842, #e8a010);
+  color: #1a1a1a;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(245,200,66,.35);
+  transition: filter .15s, transform .1s;
+}
+.bid-confirm:active { transform: scale(.97); filter: brightness(.95); }
+.bid-confirm:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════
+   MODAL OVERLAYS
+═══════════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 100;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.overlay.hidden { display: none; }
+.modal {
+  background: linear-gradient(160deg, #1e5232 0%, #0a2315 100%);
+  border-radius: 20px;
+  padding: 24px 20px;
+  width: 100%;
+  max-width: 380px;
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 24px 64px rgba(0,0,0,.7);
+  text-align: center;
+}
+.modal h2 { font-size: 1.3rem; color: var(--gold); margin-bottom: 6px; font-weight: 800; }
+.modal .sub { font-size: .83rem; opacity: .65; margin-bottom: 14px; }
+
+/* Score table */
+.stbl { width: 100%; border-collapse: collapse; font-size: .82rem; margin: 10px 0; }
+.stbl th { background: rgba(0,0,0,.4); padding: 8px 6px; color: var(--gold); font-size: .75rem; }
+.stbl td { padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,.07); text-align: center; }
+.stbl .lead td { color: var(--gold); font-weight: 700; }
+.stbl .me   td { background: rgba(245,200,66,.08); }
+
+/* Round result grid */
+.rr-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 5px 10px;
+  font-size: .82rem;
+  margin: 10px 0;
+  text-align: left;
+}
+.rr-hd { font-size: .7rem; opacity: .55; padding: 2px 0; }
+.rr-name { opacity: .9; padding: 5px 6px; border-radius: 6px; }
+.rr-bid  { text-align: center; padding: 5px 6px; border-radius: 6px; opacity: .8; }
+.rr-score { text-align: right; font-weight: 800; padding: 5px 6px; border-radius: 6px; }
+.rr-pos { color: #5dff96; }
+.rr-neg { color: #ff6a6a; }
+.me-row .rr-name,
+.me-row .rr-bid,
+.me-row .rr-score { background: rgba(245,200,66,.1); }
+
+.modal-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #f5c842, #e8a010);
+  color: #1a1a1a;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 4px 16px rgba(245,200,66,.3);
+  transition: filter .15s, transform .1s;
+}
+.modal-btn:active { transform: scale(.97); filter: brightness(.95); }
+.modal-btn.outline {
+  background: transparent;
+  color: rgba(255,255,255,.65);
+  border: 1.5px solid rgba(255,255,255,.2);
+  box-shadow: none;
+}
+
+/* Rules */
+.rules-body {
+  text-align: left;
+  font-size: .84rem;
+  line-height: 1.75;
+  opacity: .9;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.rules-body::-webkit-scrollbar { width: 3px; }
+.rules-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 2px; }
+.rule-heading { color: var(--gold); font-weight: 700; display: block; margin-top: 10px; }
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast {
+  position: fixed;
+  top: 54px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(10,10,10,.9);
+  color: #fff;
+  padding: 9px 22px;
+  border-radius: 30px;
+  font-size: .88rem;
+  font-weight: 600;
+  z-index: 300;
+  opacity: 0;
+  transition: transform .25s, opacity .25s;
+  white-space: nowrap;
+  border: 1px solid rgba(255,255,255,.1);
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ═══════════════════════════════════════
+   INSTALL BANNER
+═══════════════════════════════════════ */
+#install-banner {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(90deg, #f5c842, #e8a010);
+  color: #1a1a1a;
+  padding: 12px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-weight: 700; font-size: .88rem;
+  z-index: 200;
+  transform: translateY(100%);
+  transition: transform .3s cubic-bezier(.34,1.3,.64,1);
+}
+#install-banner.show { transform: translateY(0); }
+#install-banner button {
+  background: #1a1a1a; color: var(--gold);
+  border: none; padding: 7px 14px;
+  border-radius: 20px; font-weight: 700; cursor: pointer; font-size: .85rem;
+}
+#ib-dismiss {
+  background: transparent !important;
+  color: rgba(0,0,0,.5) !important;
+  font-size: 1.1rem; padding: 4px 8px !important;
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     HOME SCREEN
+════════════════════════════════════════ -->
+<div id="home-screen" class="screen active">
+  <div class="logo-wrap">
+    <div class="logo-suits">
+      <span class="suit-s">♠</span><span class="suit-h">♥</span><span class="suit-d">♦</span><span class="suit-c">♣</span>
+    </div>
+    <div class="logo-title">CALL BREAK</div>
+    <div class="logo-sub">कॉल ब्रेक</div>
+  </div>
+  <button class="menu-btn primary" onclick="startSolo()">🤖 &nbsp;Computer के साथ खेलें</button>
+  <button class="menu-btn secondary" onclick="showMpScreen()">👥 &nbsp;दोस्तों के साथ खेलें</button>
+  <button class="menu-btn secondary" onclick="showRules()">📖 &nbsp;Rules पढ़ें</button>
+  <div class="home-version">v2.0 • Call Break Card Game</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MULTIPLAYER SCREEN
+════════════════════════════════════════ -->
+<div id="mp-screen" class="screen">
+  <button class="mp-back" onclick="showHome()">←</button>
+  <div class="mp-title">👥 Multiplayer</div>
+
+  <div class="mp-panel">
+    <h3>🏠 नया Room बनाएं (Host)</h3>
+    <div class="mp-status" id="host-status">🔄 Connecting...</div>
+    <div id="host-code-box" class="room-code-box" style="display:none">
+      <div class="room-code-text" id="host-code-text"></div>
+      <div style="font-size:.7rem;opacity:.5;margin-top:4px">यह code दोस्तों को share करें</div>
+    </div>
+    <div class="player-slots" id="host-slots" style="display:none"></div>
+    <button class="mp-btn gold" id="start-mp-btn" style="display:none" onclick="startMpGame()">🎮 Game शुरू करें</button>
+    <button class="mp-btn outline" id="copy-code-btn" style="display:none" onclick="copyRoomCode()">📋 Code Copy करें</button>
+  </div>
+
+  <div class="mp-divider">— या Room Join करें —</div>
+
+  <div class="mp-panel">
+    <h3>🔗 Join करें</h3>
+    <input class="mp-input" type="text" id="join-code" placeholder="CODE" maxlength="6">
+    <input class="mp-input name-input" type="text" id="join-name" placeholder="आपका नाम" maxlength="12">
+    <button class="mp-btn gold" onclick="joinRoom()">🎯 Join करें</button>
+    <div class="mp-status" id="join-status"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     GAME SCREEN
+════════════════════════════════════════ -->
+<div id="game-screen" class="screen">
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="tb-round" id="tb-round">Round 1/5</div>
+    <div class="tb-scores" id="tb-scores"></div>
+    <div class="tb-icon" onclick="showScoreBoard()" title="Score">📊</div>
+  </div>
+
+  <!-- PLAY AREA -->
+  <div class="play-area">
+
+    <!-- Top opponent (seat +2) -->
+    <div class="ozone top" id="ozone2">
+      <div class="pinfo">
+        <div class="plabel" id="plbl2">P2</div>
+        <div class="opp-backs" id="obacks2"></div>
+      </div>
+    </div>
+
+    <!-- Left opponent (seat +3) -->
+    <div class="ozone left" id="ozone3">
+      <div class="pinfo">
+        <div class="opp-backs" id="obacks3"></div>
+        <div class="plabel" id="plbl3">P3</div>
+      </div>
+    </div>
+
+    <!-- CENTER TABLE -->
+    <div class="center-zone" id="center-zone">
+      <div class="cslot t" id="cslot2"></div>
+      <div class="cslot l" id="cslot3"></div>
+      <div class="cslot r" id="cslot1"></div>
+      <div class="cslot b" id="cslot0"></div>
+      <div class="trick-banner" id="trick-banner"></div>
+    </div>
+
+    <!-- Right opponent (seat +1) -->
+    <div class="ozone right" id="ozone1">
+      <div class="pinfo">
+        <div class="plabel" id="plbl1">P1</div>
+        <div class="opp-backs" id="obacks1"></div>
+      </div>
+    </div>
+
+    <!-- MY HAND -->
+    <div class="my-area">
+      <div class="my-label" id="my-label">आप</div>
+      <div class="my-hand" id="my-hand"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     BIDDING BOTTOM SHEET
+════════════════════════════════════════ -->
+<div class="sheet-overlay hidden" id="bid-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">🎯 अपना Bid लगाएं</div>
+    <div class="sheet-hint" id="bid-hint">आपके पास कितने ♠ Spades हैं?</div>
+    <div class="bid-grid" id="bid-grid"></div>
+    <button class="bid-confirm" id="bid-confirm-btn" onclick="confirmBid()" disabled>
+      Bid Select करें
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SCORE / RESULT OVERLAY
+════════════════════════════════════════ -->
+<div class="overlay hidden" id="score-overlay">
+  <div class="modal">
+    <h2 id="score-title">Round खत्म!</h2>
+    <div class="rr-grid" id="rr-grid"></div>
+    <table class="stbl" id="stbl"></table>
+    <button class="modal-btn" id="next-btn" onclick="nextRound()">▶ अगला Round</button>
+    <button class="modal-btn outline" onclick="document.getElementById('score-overlay').classList.add('hidden')">✕ बंद करें</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     RULES OVERLAY
+════════════════════════════════════════ -->
+<div class="overlay hidden" id="rules-overlay">
+  <div class="modal">
+    <h2>📖 Call Break Rules</h2>
+    <div class="rules-body">
+      <span class="rule-heading">🎯 खेल का उद्देश्य</span>
+      5 rounds में सबसे ज़्यादा score बनाएं।
+
+      <span class="rule-heading">🃏 Cards</span>
+      52 cards, 4 players — हर player को 13 cards मिलते हैं।
+
+      <span class="rule-heading">♠ Trump</span>
+      Spades (♠) हमेशा trump होते हैं। Blue border वाले cards trump हैं।
+
+      <span class="rule-heading">🤙 Bidding</span>
+      हर player बताता है कि वो कितने tricks जीतेगा (minimum 1)।
+
+      <span class="rule-heading">▶ Card खेलने के Rules</span>
+      1. अगर आपके पास lead suit है → वही खेलना होगा<br>
+      2. अगर lead suit नहीं है और कोई trump नहीं खेला → ♠ Spade खेलना होगा<br>
+      3. अगर lead suit नहीं है और trump पहले से खेला जा चुका है:<br>
+      &nbsp;&nbsp;• उससे बड़ा trump हो → बड़ा trump खेलना होगा<br>
+      &nbsp;&nbsp;• बड़ा trump नहीं → कोई भी card खेल सकते हैं<br>
+      4. अगर Spade भी नहीं → कोई भी card
+
+      <span class="rule-heading">🏆 Trick जीतना</span>
+      सबसे ऊंचा trump जीतता है। अगर trump नहीं तो सबसे ऊंचा lead suit card।<br>
+      <em>A &gt; K &gt; Q &gt; J &gt; 10 &gt; 9 &gt; 8 &gt; 7 &gt; 6 &gt; 5 &gt; 4 &gt; 3 &gt; 2</em>
+
+      <span class="rule-heading">💯 Scoring</span>
+      ✅ Bid पूरा: +bid + 0.1 × extra tricks<br>
+      ❌ Bid fail: −bid
+    </div>
+    <button class="modal-btn" onclick="document.getElementById('rules-overlay').classList.add('hidden')">✕ बंद करें</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Install Banner -->
+<div id="install-banner">
+  <span>📱 App Install करें — Offline भी चलेगा!</span>
+  <div style="display:flex;gap:6px">
+    <button onclick="installApp()">Install</button>
+    <button id="ib-dismiss" onclick="dismissInstall()">✕</button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   CONSTANTS
+══════════════════════════════════════════ */
+const SUITS      = ['♠','♥','♦','♣'];
+const RANKS      = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const RANK_VAL   = {2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
+const TRUMP      = '♠';
+const NUM_ROUNDS = 5;
+const AI_MS      = 850;
+const NAMES_DEF  = ['आप','Rahul','Priya','Amit'];
+
+let G = {};
+
+function initG(mode, myName, isHost) {
+  G = {
+    mode, isHost,
+    round: 1, phase: 'bid',
+    hands:      [[],[],[],[]],
+    bids:       [0,0,0,0],
+    tricks:     [0,0,0,0],
+    total:      [0,0,0,0],
+    trick:      [],              // [{player,card}]
+    cur:        0,               // current player index
+    lead:       0,               // who leads the round
+    trickNum:   0,
+    myIdx:      0,
+    names:      [...NAMES_DEF],
+    selBid:     null,
+    bidsDone:   0,
+    /* mp */
+    peer: null, peers: {},
+    myName: myName || 'आप',
+    roomCode: null,
+    mpPlayers: [],
+  };
+  if (myName) G.names[0] = myName;
+}
+
+/* ══════════════════════════════════════════
+   DECK
+══════════════════════════════════════════ */
+const makeDeck = () => SUITS.flatMap(s => RANKS.map(r => ({suit:s, rank:r})));
+
+function shuffle(a) {
+  for (let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function deal() {
+  const deck = shuffle(makeDeck());
+  G.hands = [[],[],[],[]];
+  deck.forEach((c,i) => G.hands[i%4].push(c));
+  G.hands.forEach((_,p) => sortHand(p));
+}
+
+function sortHand(p) {
+  const so = {'♠':0,'♥':1,'♦':2,'♣':3};
+  G.hands[p].sort((a,b) => so[a.suit]-so[b.suit] || RANK_VAL[b.rank]-RANK_VAL[a.rank]);
+}
+
+/* ══════════════════════════════════════════
+   CARD ELEMENTS
+══════════════════════════════════════════ */
+function cardEl(card, {played=false, sel=false, dim=false, onClick=null}={}) {
+  const red   = card.suit==='♥'||card.suit==='♦';
+  const trump = card.suit===TRUMP;
+  const el    = document.createElement('div');
+  el.className = ['card', red?'red':'black', trump?'trump':'', played?'played':'', sel?'sel':'', dim?'dim':''].filter(Boolean).join(' ');
+  el.innerHTML = `<span class="cr">${card.rank}</span><span class="cs">${card.suit}</span><span class="crb">${card.rank}</span>`;
+  if (onClick && sel) el.addEventListener('click', onClick);
+  return el;
+}
+
+function backEl() {
+  const el = document.createElement('div');
+  el.className = 'cback';
+  return el;
+}
+
+/* ══════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════ */
+function renderAll() {
+  renderTopBar();
+  renderOpponents();
+  renderMyHand();
+  renderCenter();
+}
+
+function renderTopBar() {
+  document.getElementById('tb-round').textContent = `Round ${G.round}/${NUM_ROUNDS}`;
+  const sc = document.getElementById('tb-scores');
+  sc.innerHTML = G.total.map((s,i) =>
+    `<span class="s${i===G.myIdx?' me':''}">${G.names[i]}: ${s.toFixed(1)}</span>`
+  ).join('');
+}
+
+function renderOpponents() {
+  [1,2,3].forEach(rel => {
+    const p   = (G.myIdx + rel) % 4;
+    const lbl = document.getElementById(`plbl${rel}`);
+    const bks = document.getElementById(`obacks${rel}`);
+
+    // Label
+    const isAct = G.cur===p && G.phase==='play';
+    const bidTxt = G.phase==='play'
+      ? `<span class="tchip${G.tricks[p]>=G.bids[p]?' met':' fail'}">${G.tricks[p]}/${G.bids[p]}</span>`
+      : (G.bids[p]>0 ? `<span class="tchip">${G.bids[p]}</span>` : '');
+    lbl.innerHTML = G.names[p] + bidTxt;
+    lbl.className = 'plabel' + (isAct?' active':'');
+
+    // Card backs
+    bks.innerHTML = '';
+    const n = Math.min(G.hands[p].length, rel===2?8:5);
+    for (let i=0;i<n;i++) bks.appendChild(backEl());
+  });
+}
+
+function renderMyHand() {
+  const p    = G.myIdx;
+  const hand = document.getElementById('my-hand');
+  hand.innerHTML = '';
+
+  const isMyTurn = G.cur===p && G.phase==='play';
+  const valid = isMyTurn ? getValid(p) : [];
+
+  const lbl = document.getElementById('my-label');
+  const bidTxt = G.phase==='play'
+    ? `<span class="tchip${G.tricks[p]>=G.bids[p]?' met':' fail'}">${G.tricks[p]}/${G.bids[p]}</span>`
+    : (G.bids[p]>0 ? `<span class="tchip">${G.bids[p]}</span>` : '');
+  lbl.innerHTML = G.names[p] + bidTxt;
+  lbl.className = 'my-label' + (isMyTurn?' active':'');
+
+  G.hands[p].forEach(card => {
+    const isValid = valid.some(c=>c.suit===card.suit&&c.rank===card.rank);
+    const el = cardEl(card, {
+      sel: isMyTurn && isValid,
+      dim: isMyTurn && !isValid,
+      onClick: isMyTurn && isValid ? ()=>playCard(p, card) : null
+    });
+    hand.appendChild(el);
+  });
+}
+
+function renderCenter() {
+  [0,1,2,3].forEach(p => {
+    const sl  = document.getElementById(`cslot${p}`);
+    sl.innerHTML = '';
+    const e = G.trick.find(x=>x.player===p);
+    if (e) sl.appendChild(cardEl(e.card, {played:true}));
+  });
+}
+
+/* ══════════════════════════════════════════
+   GAME FLOW
+══════════════════════════════════════════ */
+function startSolo() {
+  initG('solo', null, true);
+  showScreen('game-screen');
+  startRound();
+}
+
+function startRound() {
+  G.bids   = [0,0,0,0];
+  G.tricks = [0,0,0,0];
+  G.trick  = [];
+  G.bidsDone = 0;
+  G.selBid   = null;
+  G.phase    = 'bid';
+  G.cur      = G.lead;
+  G.trickNum = 0;
+  deal();
+  renderAll();
+  // ── FIX 1: show cards first, then bid after a short delay ──
+  setTimeout(startBidding, 600);
+}
+
+function startBidding() {
+  G.phase    = 'bid';
+  G.bidsDone = 0;
+  G.cur      = G.lead;
+  processBid();
+}
+
+function processBid() {
+  if (G.bidsDone >= 4) {
+    G.phase = 'play';
+    G.cur   = G.lead;
+    renderAll();
+    const summary = G.names.map((n,i)=>`${n}:${G.bids[i]}`).join(' ');
+    showToast(`Bids — ${summary}`, 2200);
+    setTimeout(startPlay, 600);
+    return;
+  }
+  const p = (G.lead + G.bidsDone) % 4;
+  G.cur = p;
+  if (p === G.myIdx) {
+    showBidSheet();
+  } else {
+    setTimeout(()=>{
+      G.bids[p] = aiBid(p);
+      G.bidsDone++;
+      renderAll();
+      processBid();
+    }, 380);
+  }
+}
+
+function showBidSheet() {
+  const trumpCount = G.hands[G.myIdx].filter(c=>c.suit===TRUMP).length;
+  document.getElementById('bid-hint').textContent =
+    `आपके पास ${trumpCount} ♠ Spades हैं। कितने tricks जीतेंगे?`;
+
+  const grid = document.getElementById('bid-grid');
+  grid.innerHTML = '';
+  G.selBid = null;
+  const btn = document.getElementById('bid-confirm-btn');
+  btn.disabled = true;
+  btn.textContent = 'Bid Select करें';
+
+  for (let i=1;i<=13;i++) {
+    const b = document.createElement('button');
+    b.className = 'bid-btn';
+    b.textContent = i;
+    b.onclick = ()=>{
+      document.querySelectorAll('.bid-btn').forEach(x=>x.classList.remove('picked'));
+      b.classList.add('picked');
+      G.selBid = i;
+      btn.disabled = false;
+      btn.textContent = `✅ Bid ${i} Confirm करें`;
+    };
+    grid.appendChild(b);
+  }
+  document.getElementById('bid-sheet').classList.remove('hidden');
+}
+
+function confirmBid() {
+  if (!G.selBid) return;
+  document.getElementById('bid-sheet').classList.add('hidden');
+  G.bids[G.myIdx] = G.selBid;
+  G.bidsDone++;
+  renderAll();
+  processBid();
+}
+
+function startPlay() {
+  G.phase = 'play';
+  G.trick = [];
+  processPlay();
+}
+
+function processPlay() {
+  if (G.cur === G.myIdx) { renderAll(); return; }
+  const ms = G.trick.length===0 ? 650 : AI_MS;
+  setTimeout(()=>{ const c = aiPlay(G.cur); playCard(G.cur, c); }, ms);
+}
+
+function playCard(player, card) {
+  if (G.phase!=='play' || G.cur!==player) return;
+  const idx = G.hands[player].findIndex(c=>c.suit===card.suit&&c.rank===card.rank);
+  if (idx<0) return;
+  G.hands[player].splice(idx,1);
+  G.trick.push({player, card});
+  renderAll();
+  if (G.trick.length<4) {
+    G.cur = (G.cur+1)%4;
+    processPlay();
+  } else {
+    setTimeout(resolveTrick, 500);
+  }
+}
+
+function resolveTrick() {
+  const winner = trickWinner(G.trick);
+  G.tricks[winner]++;
+  G.trickNum++;
+
+  const banner = document.getElementById('trick-banner');
+  banner.textContent = `${G.names[winner]} जीता! 🏆`;
+  banner.classList.add('show');
+
+  setTimeout(()=>{
+    banner.classList.remove('show');
+    G.trick    = [];
+    G.cur      = winner;
+    G.lead     = winner;
+    if (G.trickNum>=13) setTimeout(endRound, 400);
+    else { renderAll(); processPlay(); }
+  }, 1100);
+}
+
+function trickWinner(trick) {
+  const lead = trick[0];
+  let best = lead;
+  for (let i=1;i<trick.length;i++)
+    if (beats(trick[i].card, best.card, lead.card.suit)) best = trick[i];
+  return best.player;
+}
+
+function beats(ch, cur, leadSuit) {
+  const cT = ch.suit===TRUMP, curT = cur.suit===TRUMP;
+  const cL = ch.suit===leadSuit, curL = cur.suit===leadSuit;
+  if ( cT && !curT) return true;
+  if (!cT &&  curT) return false;
+  if ( cT &&  curT) return RANK_VAL[ch.rank]>RANK_VAL[cur.rank];
+  if ( cL && !curL) return true;
+  if (!cL &&  curL) return false;
+  return RANK_VAL[ch.rank]>RANK_VAL[cur.rank];
+}
+
+/* ══════════════════════════════════════════
+   VALID CARDS — with Over-trump Rule (FIX 2)
+══════════════════════════════════════════
+
+  If player has lead suit → must play lead suit.
+  If NO lead suit:
+    Case A — a trump has already been played in the current trick:
+      • Find the highest trump currently played.
+      • If player has a trump HIGHER than that → must play one of those.
+      • If player has NO trump higher than the highest played trump
+          → any card (they are NOT forced to play a smaller trump).
+    Case B — no trump played yet:
+      • If player has trump → must play any trump.
+      • Otherwise → any card.
+══════════════════════════════════════════ */
+function getValid(player) {
+  const hand = G.hands[player];
+  if (G.trick.length===0) return hand;                    // Leading — anything
+
+  const leadSuit = G.trick[0].card.suit;
+  const hasSuit  = hand.some(c=>c.suit===leadSuit);
+  if (hasSuit) return hand.filter(c=>c.suit===leadSuit);  // Must follow suit
+
+  // Cannot follow suit
+  const trumpsInTrick = G.trick.filter(e=>e.card.suit===TRUMP);
+
+  if (trumpsInTrick.length > 0) {
+    // Case A: trump already played — over-trump rule
+    const highestTrumpVal = Math.max(...trumpsInTrick.map(e=>RANK_VAL[e.card.rank]));
+    const higherTrumps    = hand.filter(c=>c.suit===TRUMP && RANK_VAL[c.rank]>highestTrumpVal);
+    if (higherTrumps.length>0) return higherTrumps;       // Must over-trump
+    return hand;                                           // No higher trump → free choice
+  } else {
+    // Case B: no trump played yet — must play trump if available
+    const hasTrump = hand.some(c=>c.suit===TRUMP);
+    if (hasTrump) return hand.filter(c=>c.suit===TRUMP);
+    return hand;                                           // No trump → any card
+  }
+}
+
+/* ══════════════════════════════════════════
+   SCORING
+══════════════════════════════════════════ */
+function endRound() {
+  const rs = G.bids.map((bid,p)=>{
+    const t = G.tricks[p];
+    const s = t>=bid ? bid+(t-bid)*.1 : -bid;
+    G.total[p] = +( G.total[p]+s ).toFixed(1);
+    return s;
+  });
+  showRoundResult(rs);
+}
+
+function showRoundResult(rs) {
+  const ov  = document.getElementById('score-overlay');
+  const tt  = document.getElementById('score-title');
+  const rrg = document.getElementById('rr-grid');
+  const st  = document.getElementById('stbl');
+  const nb  = document.getElementById('next-btn');
+
+  tt.textContent = `Round ${G.round} खत्म! 🎉`;
+
+  rrg.innerHTML = `
+    <div class="rr-hd">Player</div><div class="rr-hd" style="text-align:center">Bid/Tricks</div><div class="rr-hd" style="text-align:right">Score</div>
+    ${[0,1,2,3].map(p=>`
+      <div class="rr-name${p===G.myIdx?' me-row':''}">${G.names[p]}${p===G.myIdx?' ★':''}</div>
+      <div class="rr-bid${p===G.myIdx?' me-row':''}">${G.bids[p]} / ${G.tricks[p]}</div>
+      <div class="rr-score${p===G.myIdx?' me-row':''} ${rs[p]>=0?' rr-pos':' rr-neg'}">${rs[p]>=0?'+':''}${rs[p].toFixed(1)}</div>
+    `).join('')}
+  `;
+
+  const sorted = [0,1,2,3].sort((a,b)=>G.total[b]-G.total[a]);
+  st.innerHTML = `
+    <tr><th>#</th><th>Player</th><th>Total</th></tr>
+    ${sorted.map((p,r)=>`
+      <tr class="${r===0?'lead':''} ${p===G.myIdx?'me':''}">
+        <td>${r+1}</td>
+        <td>${G.names[p]}${p===G.myIdx?' ★':''}</td>
+        <td>${G.total[p].toFixed(1)}</td>
+      </tr>
+    `).join('')}
+  `;
+
+  if (G.round>=NUM_ROUNDS) {
+    const w = sorted[0];
+    nb.textContent = `🏆 ${G.names[w]} जीता! — Home`;
+    nb.onclick = ()=>{ ov.classList.add('hidden'); showHome(); };
+  } else {
+    nb.textContent = `▶ Round ${G.round+1} शुरू करें`;
+    nb.onclick = nextRound;
+  }
+  ov.classList.remove('hidden');
+}
+
+function nextRound() {
+  document.getElementById('score-overlay').classList.add('hidden');
+  G.round++;
+  G.lead = (G.lead+1)%4;
+  startRound();
+}
+
+function showScoreBoard() {
+  showRoundResult(G.total.map(()=>0));
+  const nb = document.getElementById('next-btn');
+  nb.textContent = '✕ बंद करें';
+  nb.onclick = ()=>document.getElementById('score-overlay').classList.add('hidden');
+}
+
+/* ══════════════════════════════════════════
+   AI  (also uses corrected getValid)
+══════════════════════════════════════════ */
+function aiBid(p) {
+  const h = G.hands[p];
+  const trumps    = h.filter(c=>c.suit===TRUMP);
+  const highTr    = trumps.filter(c=>RANK_VAL[c.rank]>=10);
+  const nonTr     = h.filter(c=>c.suit!==TRUMP);
+  let bid = highTr.length
+          + nonTr.filter(c=>c.rank==='A').length
+          + Math.floor(nonTr.filter(c=>c.rank==='K').length*.5)
+          + Math.floor((trumps.length-highTr.length)*.35);
+  return Math.max(1, Math.min(bid, 8));
+}
+
+function aiPlay(p) {
+  const valid      = getValid(p);
+  const bid        = G.bids[p];
+  const needsMore  = G.tricks[p] < bid;
+
+  if (G.trick.length===0) return aiLead(valid, needsMore);
+  return aiFollow(valid, needsMore);
+}
+
+function aiLead(valid, needsMore) {
+  if (needsMore) {
+    const tr = valid.filter(c=>c.suit===TRUMP).sort((a,b)=>RANK_VAL[b.rank]-RANK_VAL[a.rank]);
+    if (tr.length && RANK_VAL[tr[0].rank]>=10) return tr[0];
+    const ac = valid.filter(c=>c.rank==='A');
+    if (ac.length) return ac[0];
+    const kg = valid.filter(c=>c.rank==='K');
+    if (kg.length) return kg[0];
+    if (tr.length) return tr[0];
+  }
+  return valid.slice().sort((a,b)=>RANK_VAL[a.rank]-RANK_VAL[b.rank])[0];
+}
+
+function aiFollow(valid, needsMore) {
+  const leadSuit = G.trick[0].card.suit;
+  const best = G.trick.reduce((b,e)=>beats(e.card,b.card,leadSuit)?e:b, G.trick[0]);
+  if (needsMore) {
+    const canBeat = valid.filter(c=>beats(c,best.card,leadSuit));
+    if (canBeat.length)
+      return canBeat.sort((a,b)=>RANK_VAL[a.rank]-RANK_VAL[b.rank])[0];
+  }
+  return valid.slice().sort((a,b)=>RANK_VAL[a.rank]-RANK_VAL[b.rank])[0];
+}
+
+/* ══════════════════════════════════════════
+   MULTIPLAYER  (PeerJS)
+══════════════════════════════════════════ */
+function showMpScreen() {
+  showScreen('mp-screen');
+  initHost();
+}
+
+function initHost() {
+  const code = Math.random().toString(36).substring(2,8).toUpperCase();
+  G.roomCode = code;
+  G.isHost   = true;
+  G.mpPlayers = [{peerId:'host', name: G.myName||'Host', seat:0}];
+
+  const hs = document.getElementById('host-status');
+  hs.textContent = '🔄 Connecting...';
+  document.getElementById('host-code-box').style.display = 'none';
+  document.getElementById('host-slots').style.display    = 'none';
+  document.getElementById('start-mp-btn').style.display  = 'none';
+  document.getElementById('copy-code-btn').style.display = 'none';
+
+  try {
+    G.peer = new Peer(code, {host:'0.peerjs.com',port:443,path:'/',secure:true,debug:0});
+    G.peer.on('open',()=>{
+      hs.textContent = '✅ Room तैयार! Code share करें:';
+      document.getElementById('host-code-text').textContent = code;
+      document.getElementById('host-code-box').style.display = 'block';
+      document.getElementById('host-slots').style.display    = 'grid';
+      document.getElementById('copy-code-btn').style.display = 'block';
+      updateSlots();
+    });
+    G.peer.on('connection', conn=>{
+      conn.on('open',()=>{
+        G.peers[conn.peer]=conn;
+        conn.on('data', d=>handleMp(conn.peer, d));
+        conn.on('close',()=>{ delete G.peers[conn.peer]; updateSlots(); });
+      });
+    });
+    G.peer.on('error', e=>{ hs.textContent='❌ '+e.type; });
+  } catch(e) { hs.textContent='❌ PeerJS unavailable'; }
+}
+
+function updateSlots() {
+  const sl    = document.getElementById('host-slots');
+  const peers = Object.keys(G.peers);
+  const total = 1+peers.length;
+  sl.innerHTML = '';
+
+  const mk=(name,cls)=>{ const d=document.createElement('div'); d.className='slot '+cls; d.textContent=name; sl.appendChild(d); };
+  mk(G.myName||'Host (आप)', 'you');
+  peers.forEach(pid=>{ const mp=G.mpPlayers.find(x=>x.peerId===pid); mk(mp?mp.name:'...','filled'); });
+  for (let i=total;i<4;i++) mk('खाली...','');
+
+  const sb = document.getElementById('start-mp-btn');
+  sb.style.display = total>=2 ? 'block' : 'none';
+  sb.textContent   = `🎮 ${total} Players के साथ शुरू करें`;
+}
+
+function copyRoomCode() {
+  navigator.clipboard.writeText(G.roomCode).then(()=>showToast('Code Copy हो गया! ✓'));
+}
+
+function joinRoom() {
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  const name = document.getElementById('join-name').value.trim() || 'Friend';
+  if (code.length<4) { showToast('Room Code डालें!'); return; }
+  document.getElementById('join-status').textContent='🔄 Connecting...';
+  G.myName  = name; G.isHost = false;
+  const myId='p'+Math.random().toString(36).substring(2,8);
+  G.peer = new Peer(myId,{host:'0.peerjs.com',port:443,path:'/',secure:true,debug:0});
+  G.peer.on('open',()=>{
+    const conn=G.peer.connect(code);
+    G.peers[code]=conn; G.roomCode=code;
+    conn.on('open',()=>{ document.getElementById('join-status').textContent='✅ Connected!'; conn.send({type:'join',name,peerId:myId}); });
+    conn.on('data', d=>handleMp(code, d));
+    conn.on('close',()=>{ document.getElementById('join-status').textContent='❌ Disconnected'; });
+  });
+  G.peer.on('error',e=>{ document.getElementById('join-status').textContent='❌ '+(e.type==='peer-unavailable'?'Room नहीं मिला':'Connection error'); });
+}
+
+function startMpGame() {
+  if (!G.isHost) return;
+  const pl=Object.keys(G.peers);
+  G.mpPlayers=[{peerId:'host',name:G.myName||'Host',seat:0}];
+  pl.forEach((pid,i)=>{ const mp=G.mpPlayers.find(x=>x.peerId===pid); G.mpPlayers.push({peerId:pid,name:mp?mp.name:`P${i+2}`,seat:i+1}); });
+  initG('multi', G.myName, true);
+  G.mpPlayers.forEach(x=>{ if(x.seat<4) G.names[x.seat]=x.name; });
+  deal();
+  pl.forEach((pid,i)=>{
+    G.peers[pid].send({type:'game-start',seat:i+1,names:G.names,hand:G.hands[i+1],total:G.total,round:G.round,lead:G.lead});
+  });
+  showScreen('game-screen');
+  startRound();
+}
+
+function handleMp(fromId, data) {
+  if (data.type==='join') {
+    if (!G.mpPlayers.find(x=>x.peerId===fromId)) G.mpPlayers.push({peerId:fromId,name:data.name,seat:G.mpPlayers.length});
+    updateSlots();
+    if (G.peers[fromId]) G.peers[fromId].send({type:'joined'});
+    return;
+  }
+  if (data.type==='joined') { document.getElementById('join-status').textContent='✅ Joined! Host के start का wait करें...'; return; }
+  if (data.type==='game-start') {
+    initG('multi', G.myName, false);
+    G.myIdx=data.seat; G.names=data.names; G.hands[data.seat]=data.hand;
+    G.total=data.total; G.round=data.round; G.lead=data.lead;
+    showScreen('game-screen'); startRound();
+    return;
+  }
+  if (data.type==='bid')  { G.bids[data.player]=data.bid; G.bidsDone++; renderAll(); processBid(); return; }
+  if (data.type==='play') { playCard(data.player, data.card); return; }
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>{ s.classList.remove('active'); s.style.display='none'; });
+  const s=document.getElementById(id);
+  s.style.display = id==='game-screen'?'grid':'flex';
+  s.classList.add('active');
+}
+
+function showHome() {
+  if (G.peer) { try{G.peer.destroy();}catch(e){} G.peer=null; }
+  G.peers={};
+  document.getElementById('bid-sheet').classList.add('hidden');
+  showScreen('home-screen');
+}
+
+function showRules() { document.getElementById('rules-overlay').classList.remove('hidden'); }
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+let _tt;
+function showToast(msg, ms=1900) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(_tt);
+  _tt=setTimeout(()=>t.classList.remove('show'), ms);
+}
+
+/* ══════════════════════════════════════════
+   PWA
+══════════════════════════════════════════ */
+let _dp;
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); _dp=e; setTimeout(()=>document.getElementById('install-banner').classList.add('show'),4000); });
+function installApp() { if(!_dp)return; _dp.prompt(); _dp.userChoice.then(()=>{ _dp=null; dismissInstall(); }); }
+function dismissInstall() { document.getElementById('install-banner').classList.remove('show'); }
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+/* ══════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════ */
+initG('solo', null, true);
+showScreen('home-screen');
+</script>
+</body>
+</html>
